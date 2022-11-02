@@ -88,7 +88,6 @@ function createFloor(floor) {
   const floorCubeMaterial = new THREE.MeshStandardMaterial({
     color: "white",
     transparent: true,
-    opacity: 0.5,
   });
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
@@ -124,6 +123,7 @@ function changeFloorColor() {
   for (const object of objects) {
     for (const children of object.children) {
       children.material.color.set("#ffffff");
+      children.material.opacity = 1;
     }
   }
 
@@ -144,17 +144,21 @@ function changeFloorColor() {
 
       for (let i = 1; i <= idx; i++) {
         objects[i].visible = true;
+        
       }
 
       // chaning color of floor
       if (objects[idx] !== undefined) {
         for (const children of objects[idx].children) {
           children.material.color.set("#A83D3D");
+          children.material.opacity = 0.5;
         }
       }
     }
   }
 }
+
+// Click function to change scene
 
 window.addEventListener("click", () => {
   if (flag) {
