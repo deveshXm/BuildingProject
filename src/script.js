@@ -113,7 +113,7 @@ function createPlane() {
 
 // FLOOR
 
-const floorCubeGeometry = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
+const floorCubeGeometry = new THREE.BoxBufferGeometry(1, 0.5, 1);
 
 function createFloor(floor) {
   for (let i = 0; i < 3; i++) {
@@ -123,8 +123,8 @@ function createFloor(floor) {
         transparent: true,
       });
       const floorCube = new THREE.Mesh(floorCubeGeometry, floorCubeMaterial);
-      floorCube.position.x = 0.5 * i;
-      floorCube.position.z = 0.5 * j;
+      floorCube.position.x = 1 * i;
+      floorCube.position.z = 1 * j;
       floorCube.castShadow = true;
       floor.add(floorCube);
     }
@@ -150,7 +150,7 @@ function createBuilding() {
 function changeRoomColor() {
   for (const obj of objects[0].children) {
     obj.material.transparent = true;
-    obj.material.opacity = 1;
+    obj.material.opacity = 0.7;
     obj.material.color.set("#ffffff");
   }
 
@@ -168,7 +168,7 @@ function changeRoomColor() {
     // chaning color of floor
 
     if (currentIntersect.object.geometry.type !== "PlaneGeometry") {
-      currentIntersect.object.material.color.set("#A83D3D");
+      currentIntersect.object.material.color.set("#A83D00");
       currentIntersect.object.material.opacity = 0.5;
     }
   }
@@ -223,7 +223,7 @@ window.addEventListener("click", () => {
     if (currentIntersect !== null) {
       deleteGroup();
     }
-    camera.zoom = 1.7;
+    camera.zoom = 1.2;
     camera.updateProjectionMatrix();
 
     changeToFloorView();
