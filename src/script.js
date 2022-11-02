@@ -54,7 +54,7 @@ const clock = new THREE.Clock();
 
 renderer.setSize(sizes.width, sizes.height);
 
-camera.position.set(5, 5, 5);
+camera.position.set(3, 3, 3);
 
 // orbit controls
 
@@ -80,76 +80,110 @@ window.addEventListener("mousemove", (event) => {
   mouse.y = -((event.clientY / sizes.height) * 2 - 1);
 });
 
-var raycaster = new THREE.Raycaster();
-var objects = [];
+// GLOBALS
 
-// Building
+let raycaster = new THREE.Raycaster();
+let objects = [];
+let intersects = null;
+let count = 6;
 
-// floor
+// BUILDING
 
-const floorGeometry = new THREE.BoxBufferGeometry(2, 0.5, 2);
+function createBuilding() {
+  let height = 0;
 
-let count = 10;
-let height = 0;
+  // FLOOR
 
-for (let i = 0; i < count; i++, height += 0.5) {
-  const floorMaterial = new THREE.MeshStandardMaterial({ color: "white" });
-  floorMaterial.transparent = true;
-  floorMaterial.opacity = 0.5;
-  const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-  floor.position.y = height;
-  objects.push(floor);
-  scene.add(floor);
+  // floor cubes
+
+  const floorCubeGeometry = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
+
+  for (let currFloor = 0; currFloor < count; currFloor++, height += 0.5) {
+    const floor = new THREE.Group();
+    const floorCubeMaterial = new THREE.MeshStandardMaterial({
+      color: "white",
+    });
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        const floorCube = new THREE.Mesh(floorCubeGeometry, floorCubeMaterial);
+        floorCube.position.x = 0.5 * i;
+        floorCube.position.z = 0.5 * j;
+        floor.add(floorCube);
+      }
+    }
+    floor.position.y = height;
+    scene.add(floor);
+    objects.push(floor);
+  }
+  console.log(objects);
 }
-console.log(objects);
 
-// hiding all floors except first one
+createBuilding();
 
-
-
-let currentIntersect = null;
-
-
-
-const tick = () => {
-  const elapsedTime = clock.getElapsedTime();
-  controls.update();
-
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObjects(objects);
-
-  for(let i = 1 ; i < count ; i++){
+function changeFloorColor() {
+  for (let i = 1; i < count; i++) {
     objects[i].visible = false;
   }
 
   for (const object of objects) {
-    object.material.color.set("#ffffff");
+    for (const children of object.children) {
+      children.material.color.set("#ffffff");
+    }
   }
 
-  if (intersects.length) {
+  if (intersects !== null) {
     if (currentIntersect === null) {
-      console.log("mouse enter");
     }
     currentIntersect = intersects[0];
-    currentIntersect.object.material.color.set("#0000ff");
+    // currentIntersect.object.material.color.set("#0000ff");
   } else {
     if (currentIntersect) {
-      console.log("mouse leave");
     }
     currentIntersect = null;
   }
 
-  if(currentIntersect !== null){
-    let idx = objects.indexOf(currentIntersect.object);
-    for(let i = 1 ; i <=idx ; i++){
-      objects[i].visible = true;
-      objects.update = true;
+  // console.log(currentIntersect);
+
+  if (currentIntersect !== null) {
+    let idx = 0;
+    if (currentIntersect) {
+      idx = objects.indexOf(currentIntersect.object.parent);
+
+      // changing visibility of floor
+
+      for (let i = 1; i <= idx; i++) {
+        objects[i].visible = true;
+      }
+
+      // chaning color of floor
+      if (objects[idx] !== undefined) {
+        for (const children of objects[idx].children) {
+          children.material.color.set("#ff0000");
+        }
+      }
     }
-    console.log(idx);
   }
+}
+
+
+let currentIntersect = null;
+const animate = () => {
+  const elapsedTime = clock.getElapsedTime();
+  controls.update();
+
+  // raycaster from mouse to camera
+
+  raycaster.setFromCamera(mouse, camera);
+
+  // checking objects intersecting
+  intersects = raycaster.intersectObjects(scene.children, true);
+
+  // changing color and visibility
+
+  changeFloorColor();
 
   renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
 };
 
-tick();
+animate();
