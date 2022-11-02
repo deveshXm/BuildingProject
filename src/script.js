@@ -13,14 +13,16 @@ let currentIntersect = null;
 
 const mouse = new THREE.Vector2();
 window.addEventListener("mousemove", (event) => {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  mouse.x = (event.clientX / sizes.width) * 2 - 1;
+  mouse.y = -(event.clientY / sizes.height) * 2 + 1;
 });
 
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
 };
+const aspect = sizes.width / sizes.height;
+const frustumSize = 500;
 
 // canvas
 
@@ -32,20 +34,35 @@ const scene = new THREE.Scene();
 
 // camera
 
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
-camera.position.set(2, 2, 2);
+/* PERSPECTIVE */
+
+// const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
+// camera.position.set(2, 2, 2);
+
+/* ORTHOGRAPHIC */
+
+var camera = new THREE.OrthographicCamera(
+  -3 * aspect,
+  3 * aspect,
+  3,
+  -3,
+  0.1,
+  1000
+);
+
+scene.add(camera);
 
 // renderer
 
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
-renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 window.addEventListener("resize", () => {
-  sizes.width = window.innerWidth;
-  sizes.height = window.innerWidth;
+  sizes.width = sizes.width;
+  sizes.height = sizes.width;
 
   // update camera
 
@@ -85,12 +102,12 @@ scene.add(ambientLight);
 const floorCubeGeometry = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
 
 function createFloor(floor) {
-  const floorCubeMaterial = new THREE.MeshStandardMaterial({
-    color: "white",
-    transparent: true,
-  });
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
+      const floorCubeMaterial = new THREE.MeshStandardMaterial({
+        color: "white",
+        transparent: true,
+      });
       const floorCube = new THREE.Mesh(floorCubeGeometry, floorCubeMaterial);
       floorCube.position.x = 0.5 * i;
       floorCube.position.z = 0.5 * j;
@@ -114,6 +131,30 @@ function createBuilding() {
 }
 
 // BUILDING MOUSE EVENTS
+
+function changeRoomColor() {
+  for (const obj of objects[0].children) {
+    obj.material.transparent = true;
+    obj.material.opacity = 0.5;
+    obj.material.color.set("#ffffff");
+  }
+
+  if (intersects.length) {
+    currentIntersect = intersects[0];
+  } else {
+    currentIntersect = null;
+  }
+
+  console.log(currentIntersect);
+
+  // remove scene & create new
+
+  if (currentIntersect !== null) {
+    // chaning color of floor
+    currentIntersect.object.material.color.set("#A83D3D");
+    currentIntersect.object.material.opacity = 0.5;
+  }
+}
 
 function changeFloorColor() {
   for (let i = 1; i < count; i++) {
@@ -144,7 +185,6 @@ function changeFloorColor() {
 
       for (let i = 1; i <= idx; i++) {
         objects[i].visible = true;
-        
       }
 
       // chaning color of floor
@@ -165,14 +205,17 @@ window.addEventListener("click", () => {
     if (currentIntersect !== null) {
       deleteGroup();
     }
-    camera.position.set(2, 2, 2);
+    camera.zoom = 1.7;
+    camera.updateProjectionMatrix();
+
     changeToFloorView();
     flag = false;
   } else {
     if (currentIntersect !== null) {
       deleteGroup();
     }
-    camera.position.set(3, 3, 3);
+    camera.zoom = 1;
+    camera.updateProjectionMatrix();
     createBuilding();
     flag = true;
   }
@@ -183,6 +226,11 @@ window.addEventListener("click", () => {
 function changeToFloorView() {
   const floor = new THREE.Group();
   createFloor(floor);
+  console.log(floor);
+  for (const obj of floor.children) {
+    obj.material.transparent = true;
+    obj.material.opacity = 0.5;
+  }
   objects.push(floor);
   scene.add(floor);
 }
@@ -191,7 +239,7 @@ function changeToFloorView() {
 
 function deleteGroup() {
   for (const group of objects) {
-      scene.remove(group);
+    scene.remove(group);
   }
 
   objects = [];
@@ -209,7 +257,6 @@ if (flag) {
 
 const animate = () => {
   controls.update();
-
   // raycaster from mouse to camera
 
   raycaster.setFromCamera(mouse, camera);
@@ -221,6 +268,8 @@ const animate = () => {
 
   if (flag) {
     changeFloorColor();
+  } else {
+    changeRoomColor();
   }
 
   renderer.render(scene, camera);
