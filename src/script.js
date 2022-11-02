@@ -84,8 +84,8 @@ camera.position.set(3, 3, 3);
 
 // orbit controls
 
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
+// const controls = new OrbitControls(camera, canvas);
+// controls.enableDamping = true;
 
 // lights
 
@@ -101,12 +101,12 @@ scene.add(ambientLight);
 
 // PLANE
 
-function createPlane() {
-  const planeGeometry = new THREE.PlaneBufferGeometry(10, 10);
-  const planeMaterial = new THREE.MeshStandardMaterial({ color: "#7CFC00" });
+function createPlane(size , color , height) {
+  const planeGeometry = new THREE.PlaneBufferGeometry(size,size);
+  const planeMaterial = new THREE.MeshStandardMaterial({ color: color });
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.rotation.x = -Math.PI / 2;
-  plane.position.y = -0.5;
+  plane.position.y = -0.25 + height;
   plane.receiveShadow = true;
   scene.add(plane);
 }
@@ -127,6 +127,8 @@ function createFloor(floor) {
       floorCube.position.z = 1 * j;
       floorCube.castShadow = true;
       floor.add(floorCube);
+      floor.position.x = -1;
+      floor.position.z = -1;
     }
   }
 }
@@ -268,15 +270,17 @@ function deleteGroup() {
 if (flag) {
   createBuilding();
 }
-
-createPlane();
+createPlane(10 , "#7CFC00" , 0);
+createPlane(3 , "#ffffff" , 0.1);
 
 /* ************************************************************ */
 
 // animate fucntion
 
 const animate = () => {
-  controls.update();
+  camera.lookAt(0,0,0)
+  camera.updateProjectionMatrix()
+  // controls.update();
   // raycaster from mouse to camera
 
   raycaster.setFromCamera(mouse, camera);
