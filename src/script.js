@@ -271,7 +271,7 @@ if (flag) {
   createBuilding();
 }
 createPlane(10 , "#7CFC00" , 0);
-createPlane(3 , "#ffffff" , 0.1);
+createPlane(3 , "#ffffff" , 0.001);
 
 /* ************************************************************ */
 
