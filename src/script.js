@@ -87,30 +87,34 @@ let objects = [];
 let intersects = null;
 let count = 6;
 
-// BUILDING
+
+
+// FLOOR
+
+const floorCubeGeometry = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
+
+function createFloor(floor) {
+  const floorCubeMaterial = new THREE.MeshStandardMaterial({
+    color: "white",
+  });
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      const floorCube = new THREE.Mesh(floorCubeGeometry, floorCubeMaterial);
+      floorCube.position.x = 0.5 * i;
+      floorCube.position.z = 0.5 * j;
+      floor.add(floorCube);
+    }
+  }
+}
 
 function createBuilding() {
   let height = 0;
 
-  // FLOOR
-
-  // floor cubes
-
-  const floorCubeGeometry = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
+// BUILDING
 
   for (let currFloor = 0; currFloor < count; currFloor++, height += 0.5) {
     const floor = new THREE.Group();
-    const floorCubeMaterial = new THREE.MeshStandardMaterial({
-      color: "white",
-    });
-    for (let i = 0; i < 3; i++) {
-      for (let j = 0; j < 3; j++) {
-        const floorCube = new THREE.Mesh(floorCubeGeometry, floorCubeMaterial);
-        floorCube.position.x = 0.5 * i;
-        floorCube.position.z = 0.5 * j;
-        floor.add(floorCube);
-      }
-    }
+    createFloor(floor);
     floor.position.y = height;
     scene.add(floor);
     objects.push(floor);
@@ -158,13 +162,12 @@ function changeFloorColor() {
       // chaning color of floor
       if (objects[idx] !== undefined) {
         for (const children of objects[idx].children) {
-          children.material.color.set("#ff0000");
+          children.material.color.set("#A83D3D");
         }
       }
     }
   }
 }
-
 
 let currentIntersect = null;
 const animate = () => {
@@ -183,7 +186,7 @@ const animate = () => {
   changeFloorColor();
 
   renderer.render(scene, camera);
-  window.requestAnimationFrame(tick);
+  window.requestAnimationFrame(animate);
 };
 
 animate();
