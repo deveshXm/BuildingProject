@@ -2,6 +2,21 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
+// GLOBALS
+
+let raycaster = new THREE.Raycaster();
+let objects = [];
+let intersects = null;
+let count = 6;
+let flag = true;
+let currentIntersect = null;
+
+const mouse = new THREE.Vector2();
+window.addEventListener("mousemove", (event) => {
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+});
+
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
@@ -19,11 +34,6 @@ const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
 camera.position.set(2, 2, 2);
-
-// axesHelper
-
-const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
 
 // renderer
 
@@ -48,8 +58,6 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-const clock = new THREE.Clock();
-
 // renderer
 
 renderer.setSize(sizes.width, sizes.height);
@@ -72,23 +80,6 @@ scene.add(ambientLight);
 
 /* ***************************************** */
 
-// Intersction hover effect
-
-const mouse = new THREE.Vector2();
-window.addEventListener("mousemove", (event) => {
-  mouse.x = (event.clientX / sizes.width) * 2 - 1;
-  mouse.y = -((event.clientY / sizes.height) * 2 - 1);
-});
-
-// GLOBALS
-
-let raycaster = new THREE.Raycaster();
-let objects = [];
-let intersects = null;
-let count = 6;
-
-
-
 // FLOOR
 
 const floorCubeGeometry = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
@@ -96,6 +87,8 @@ const floorCubeGeometry = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
 function createFloor(floor) {
   const floorCubeMaterial = new THREE.MeshStandardMaterial({
     color: "white",
+    transparent: true,
+    opacity: 0.5,
   });
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
@@ -110,7 +103,7 @@ function createFloor(floor) {
 function createBuilding() {
   let height = 0;
 
-// BUILDING
+  // BUILDING
 
   for (let currFloor = 0; currFloor < count; currFloor++, height += 0.5) {
     const floor = new THREE.Group();
@@ -119,10 +112,9 @@ function createBuilding() {
     scene.add(floor);
     objects.push(floor);
   }
-  console.log(objects);
 }
 
-createBuilding();
+// BUILDING MOUSE EVENTS
 
 function changeFloorColor() {
   for (let i = 1; i < count; i++) {
@@ -135,18 +127,13 @@ function changeFloorColor() {
     }
   }
 
-  if (intersects !== null) {
-    if (currentIntersect === null) {
-    }
+  if (intersects.length) {
     currentIntersect = intersects[0];
-    // currentIntersect.object.material.color.set("#0000ff");
   } else {
-    if (currentIntersect) {
-    }
     currentIntersect = null;
   }
 
-  // console.log(currentIntersect);
+  // remove scene & create new
 
   if (currentIntersect !== null) {
     let idx = 0;
@@ -169,9 +156,54 @@ function changeFloorColor() {
   }
 }
 
-let currentIntersect = null;
+window.addEventListener("click", () => {
+  if (flag) {
+    if (currentIntersect !== null) {
+      deleteGroup();
+    }
+    camera.position.set(2, 2, 2);
+    changeToFloorView();
+    flag = false;
+  } else {
+    if (currentIntersect !== null) {
+      deleteGroup();
+    }
+    camera.position.set(3, 3, 3);
+    createBuilding();
+    flag = true;
+  }
+});
+
+// FLOOR MOUSE EVENTS
+
+function changeToFloorView() {
+  const floor = new THREE.Group();
+  createFloor(floor);
+  objects.push(floor);
+  scene.add(floor);
+}
+
+// DELETE ENTITY
+
+function deleteGroup() {
+  for (const group of objects) {
+      scene.remove(group);
+  }
+
+  objects = [];
+}
+
+// function calls
+
+if (flag) {
+  createBuilding();
+}
+
+/* ************************************************************ */
+
+// animate fucntion
+
 const animate = () => {
-  const elapsedTime = clock.getElapsedTime();
   controls.update();
 
   // raycaster from mouse to camera
@@ -183,7 +215,9 @@ const animate = () => {
 
   // changing color and visibility
 
-  changeFloorColor();
+  if (flag) {
+    changeFloorColor();
+  }
 
   renderer.render(scene, camera);
   window.requestAnimationFrame(animate);
