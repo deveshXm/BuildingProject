@@ -22,7 +22,6 @@ const sizes = {
   height: window.innerHeight,
 };
 const aspect = sizes.width / sizes.height;
-const frustumSize = 500;
 
 // canvas
 
@@ -78,6 +77,8 @@ window.addEventListener("resize", () => {
 // renderer
 
 renderer.setSize(sizes.width, sizes.height);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 camera.position.set(3, 3, 3);
 
@@ -90,12 +91,25 @@ controls.enableDamping = true;
 
 const directionalLight = new THREE.DirectionalLight("#ffffff", 2);
 scene.add(directionalLight);
-directionalLight.position.set(2, 2, 0);
+directionalLight.position.set(2, 2, -2);
+directionalLight.castShadow = true;
 
 const ambientLight = new THREE.AmbientLight("#00ffff", 0.5);
 scene.add(ambientLight);
 
 /* ***************************************** */
+
+// PLANE
+
+function createPlane() {
+  const planeGeometry = new THREE.PlaneBufferGeometry(10, 10);
+  const planeMaterial = new THREE.MeshStandardMaterial({ color: "#7CFC00" });
+  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  plane.rotation.x = -Math.PI / 2;
+  plane.position.y = -0.5;
+  plane.receiveShadow = true;
+  scene.add(plane);
+}
 
 // FLOOR
 
@@ -111,6 +125,7 @@ function createFloor(floor) {
       const floorCube = new THREE.Mesh(floorCubeGeometry, floorCubeMaterial);
       floorCube.position.x = 0.5 * i;
       floorCube.position.z = 0.5 * j;
+      floorCube.castShadow = true;
       floor.add(floorCube);
     }
   }
@@ -135,7 +150,7 @@ function createBuilding() {
 function changeRoomColor() {
   for (const obj of objects[0].children) {
     obj.material.transparent = true;
-    obj.material.opacity = 0.5;
+    obj.material.opacity = 1;
     obj.material.color.set("#ffffff");
   }
 
@@ -151,8 +166,11 @@ function changeRoomColor() {
 
   if (currentIntersect !== null) {
     // chaning color of floor
-    currentIntersect.object.material.color.set("#A83D3D");
-    currentIntersect.object.material.opacity = 0.5;
+
+    if (currentIntersect.object.geometry.type !== "PlaneGeometry") {
+      currentIntersect.object.material.color.set("#A83D3D");
+      currentIntersect.object.material.opacity = 0.5;
+    }
   }
 }
 
@@ -229,7 +247,7 @@ function changeToFloorView() {
   console.log(floor);
   for (const obj of floor.children) {
     obj.material.transparent = true;
-    obj.material.opacity = 0.5;
+    obj.material.opacity = 1;
   }
   objects.push(floor);
   scene.add(floor);
@@ -250,6 +268,8 @@ function deleteGroup() {
 if (flag) {
   createBuilding();
 }
+
+createPlane();
 
 /* ************************************************************ */
 
