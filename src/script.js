@@ -83,7 +83,6 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 camera.position.set(3, 3, 3);
 
 // orbit controls
-
 // const controls = new OrbitControls(camera, canvas);
 // controls.enableDamping = true;
 
