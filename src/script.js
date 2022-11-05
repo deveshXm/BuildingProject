@@ -58,6 +58,11 @@ var camera = new THREE.OrthographicCamera(
   1000
 );
 
+camera.position.x = 2;
+camera.position.y = 2;
+camera.position.z = 2;
+camera.lookAt(scene.position);
+
 scene.add(camera);
 
 // renderer
@@ -91,10 +96,11 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setClearColor(0x2e2e2e);
 
 camera.position.set(10, 10, 10);
+// camera.updateProjectionMatrix();
 
 // orbit controls
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
+// const controls = new OrbitControls(camera, canvas);
+// controls.enableDamping = true;
 
 // lights
 
@@ -379,17 +385,13 @@ if (flag) {
 
 /* ************************************************************ */
 
-
-
 // animate fucntion
 
 const animate = () => {
 
-
-
   // camera.updateProjectionMatrix();
 
-  controls.update();
+  // controls.update();
   // raycaster from mouse to camera
 
   raycaster.setFromCamera(mouse, camera);
