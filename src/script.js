@@ -7,7 +7,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
 // GLOBALS
 let raycaster = new THREE.Raycaster();
-let objects = [];
+let objects = [], rooms = [];
 let intersects = null;
 let count = 6;
 let flag = true;
@@ -111,31 +111,8 @@ directionalLight.shadowCameraRight = -20;
 directionalLight.castShadow = true;
 const targetObject = new THREE.Object3D();
 scene.add(targetObject);
-// const light = new THREE.PointLight(0xffffff, 1, 40);
-// light.position.set(10, 20, 0);
-// light.castShadow = true;
-// light.shadow.camera.near = 0.1;
-// light.shadow.camera.far = 25;
-// scene.add(light);
-
-// post process
-
-// const outlinePass = new THREE.OutlinePass(new THREE.Vector2(sizes.width , sizes.height), scene, camera);
-// composer.addPass( outlinePass );
 
 /* ***************************************** */
-
-// PLANE
-
-function createPlane(size, color, height) {
-  const planeGeometry = new THREE.PlaneBufferGeometry(size, size);
-  const planeMaterial = new THREE.MeshStandardMaterial({ color: color });
-  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-  plane.rotation.x = -Math.PI / 2;
-  plane.position.y = -0.25 + height;
-  plane.receiveShadow = true;
-  scene.add(plane);
-}
 
 // FLOOR
 
@@ -156,6 +133,7 @@ function createFloor(floor) {
     });
     console.log(gltf.scene);
     console.log("done")
+    rooms.push(gltf.scene);
     floor.add(gltf.scene);
   });
   gltfLoader.load("/models/BUILDING/bedroom.gltf", (gltf) => {
@@ -163,7 +141,7 @@ function createFloor(floor) {
     var model = gltf.scene;
     console.log(gltf.scene);
     model.traverse((o) => {
-      if (o.isMesh)  o.userData.originalMaterial = o.material
+      if (o.isMesh) o.userData.originalMaterial = o.material
     });
     gltf.scene.traverse(function (child) {
       if (child.isMesh) {
@@ -171,6 +149,7 @@ function createFloor(floor) {
         child.receiveShadow = true;
       }
     });
+    rooms.push(gltf.scene);
     floor.add(gltf.scene);
   });
   gltfLoader.load("/models/BUILDING/bedroom2.gltf", (gltf) => {
@@ -178,7 +157,7 @@ function createFloor(floor) {
     var model = gltf.scene;
     console.log(gltf.scene);
     model.traverse((o) => {
-      if (o.isMesh)  o.userData.originalMaterial = o.material
+      if (o.isMesh) o.userData.originalMaterial = o.material
     });
     gltf.scene.traverse(function (child) {
       if (child.isMesh) {
@@ -186,6 +165,7 @@ function createFloor(floor) {
         child.receiveShadow = true;
       }
     });
+    rooms.push(gltf.scene);
     floor.add(gltf.scene);
   });
   gltfLoader.load("/models/BUILDING/bathroom.gltf", (gltf) => {
@@ -193,7 +173,7 @@ function createFloor(floor) {
     var model = gltf.scene;
     console.log(gltf.scene);
     model.traverse((o) => {
-      if (o.isMesh)  o.userData.originalMaterial = o.material
+      if (o.isMesh) o.userData.originalMaterial = o.material
     });
     gltf.scene.traverse(function (child) {
       if (child.isMesh) {
@@ -201,6 +181,7 @@ function createFloor(floor) {
         child.receiveShadow = true;
       }
     });
+    rooms.push(gltf.scene);
     floor.add(gltf.scene);
   });
   gltfLoader.load("/models/BUILDING/bathroom2.gltf", (gltf) => {
@@ -208,7 +189,7 @@ function createFloor(floor) {
     var model = gltf.scene;
     console.log(gltf.scene);
     model.traverse((o) => {
-      if (o.isMesh)  o.userData.originalMaterial = o.material
+      if (o.isMesh) o.userData.originalMaterial = o.material
     });
     gltf.scene.traverse(function (child) {
       if (child.isMesh) {
@@ -216,6 +197,7 @@ function createFloor(floor) {
         child.receiveShadow = true;
       }
     });
+    rooms.push(gltf.scene);
     floor.add(gltf.scene);
   });
 }
@@ -247,7 +229,6 @@ function changeFloorColor() {
   for (const floor of objects) {
     for (const model of floor.children) {
       model.traverse((o) => {
-        var newMaterial = new THREE.MeshStandardMaterial();
         if (o.isMesh) o.material = o.userData.originalMaterial
       });
     }
@@ -259,15 +240,16 @@ function changeFloorColor() {
     currentIntersect = null;
   }
   console.log(currentIntersect)
+
   // remove scene & create new
 
-  if (currentIntersect && currentIntersect !== null && currentIntersect!== undefined) {
+  if (currentIntersect && currentIntersect !== null && currentIntersect !== undefined) {
     let idx = null;
     if (currentIntersect) {
       let p = currentIntersect.object.parent;
       while (1) {
         idx = objects.indexOf(p);
-        if(idx !== null && idx !== undefined && idx !== -1){
+        if (idx !== null && idx !== undefined && idx !== -1) {
           break;
         }
         p = p.parent;
@@ -275,19 +257,17 @@ function changeFloorColor() {
 
       console.log(idx);
 
-        // changing visibility of floor
+      // changing visibility of floor
 
-        for (let i = 1; i <= idx; i++) {
-          objects[i].visible = true;
-        }
+      for (let i = 1; i <= idx; i++) {
+        objects[i].visible = true;
+      }
 
-      //   // traversing floor and changing color of floor
+      // traversing floor and changing color of floor
+
       if (objects[idx] && objects[idx] !== undefined && objects[idx] !== null) {
         for (const model of objects[idx].children) {
           model.traverse((o) => {
-            // var newMaterial = new THREE.MeshStandardMaterial({ color: "#ffffff" });
-            // if (o.isMesh) o.material = newMaterial;
-            // if (o.isMesh) o.material.opacity = 0.5;
             var newMaterial = new THREE.MeshNormalMaterial();
             if (o.isMesh) o.material = newMaterial;
           });
@@ -297,60 +277,105 @@ function changeFloorColor() {
   }
 }
 
-// // Click function to change scene
+function changeRoomColor() {
 
-// window.addEventListener("click", () => {
-//   if (flag) {
-//     if (currentIntersect !== null) {
-//       deleteGroup();
-//     }
-//     camera.zoom = 1.2;
-//     camera.updateProjectionMatrix();
+  // default material
 
-//     changeToFloorView();
-//     flag = false;
-//   } else {
-//     if (currentIntersect !== null) {
-//       deleteGroup();
-//     }
-//     camera.zoom = 1;
-//     camera.updateProjectionMatrix();
-//     createBuilding();
-//     flag = true;
-//   }
-// });
+  for (const floor of objects) {
+    for (const model of floor.children) {
+      model.traverse((o) => {
+        if (o.isMesh) o.material = o.userData.originalMaterial
+      });
+    }
+  }
+
+  if (intersects.length) {
+    currentIntersect = intersects[0];
+  } else {
+    currentIntersect = null;
+  }
+  console.log(currentIntersect)
+
+
+  if (currentIntersect && currentIntersect !== null && currentIntersect !== undefined) {
+    let idx = null;
+    if (currentIntersect) {
+      let p = currentIntersect.object.parent;
+      while (1) {
+        idx = rooms.indexOf(p);
+        if (idx !== null && idx !== undefined && idx !== -1) {
+          break;
+        }
+        p = p.parent;
+      }
+
+      console.log(idx);
+
+      // traversing floor and changing color of floor
+
+      if (rooms[idx] && rooms[idx] !== undefined && rooms[idx] !== null) {
+        for (const model of rooms[idx].children) {
+          model.traverse((o) => {
+            var newMaterial = new THREE.MeshNormalMaterial();
+            if (o.isMesh) o.material = newMaterial;
+          });
+        }
+      }
+    }
+  }
+
+
+}
+
+//Click function to change scene
+
+window.addEventListener("click", () => {
+  if (flag) {
+    if (currentIntersect !== null) {
+      deleteGroup();
+    }
+    camera.zoom = 1.8;
+    camera.updateProjectionMatrix();
+
+    changeToFloorView();
+    flag = false;
+  } else {
+    if (currentIntersect !== null) {
+      deleteGroup();
+    }
+    camera.zoom = 1;
+    camera.updateProjectionMatrix();
+    createBuilding();
+    flag = true;
+  }
+});
 
 // // FLOOR MOUSE EVENTS
 
-// function changeToFloorView() {
-//   const floor = new THREE.Group();
-//   createFloor(floor);
-//   console.log(floor);
-//   for (const obj of floor.children) {
-//     obj.material.transparent = true;
-//     obj.material.opacity = 1;
-//   }
-//   objects.push(floor);
-//   scene.add(floor);
-// }
+function changeToFloorView() {
+  const floor = new THREE.Group();
+  createFloor(floor);
+  floor.position.set(5, 0, 3);
+  console.log(floor);
+  objects.push(floor);
+  scene.add(floor);
+}
 
 // // DELETE ENTITY
 
-// function deleteGroup() {
-//   for (const group of objects) {
-//     scene.remove(group);
-//   }
+function deleteGroup() {
+  for (const group of objects) {
+    scene.remove(group);
+  }
 
-//   objects = [];
-// }
+  objects = [];
+}
 
 // // function calls
 
-// if (flag) {
-//   createBuilding();
-// }
-// createPlane(30, "#7CFC00", 0);
-createBuilding();
+if (flag) {
+  createBuilding();
+}
 
 /* ************************************************************ */
 
@@ -374,11 +399,11 @@ const animate = () => {
 
   // changing color and visibility
 
-  // if (flag) {
-  changeFloorColor();
-  // } else {
-  //   changeRoomColor();
-  // }
+  if (flag) {
+    changeFloorColor();
+  } else {
+    changeRoomColor();
+  }
 
   renderer.render(scene, camera);
   window.requestAnimationFrame(animate);
