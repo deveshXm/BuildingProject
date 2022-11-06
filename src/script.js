@@ -45,7 +45,7 @@ const scene = new THREE.Scene();
 /* PERSPECTIVE */
 
 // const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
-// camera.position.set(2, 2, 2);
+// camera.position.set(, 2, 2);
 
 /* ORTHOGRAPHIC */
 
