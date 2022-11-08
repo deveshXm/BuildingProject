@@ -157,7 +157,6 @@ function resolve(gltf) {
   var model = gltf.scene;
   model.traverse((o) => {
     if (o.isMesh) {
-      o.userData.originalMaterial = o.material
       o.castShadow = true;
       o.receiveShadow = true;
     }
