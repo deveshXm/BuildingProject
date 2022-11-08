@@ -7,38 +7,21 @@ import * as dat from "dat.gui";
 
 // GUI
 
-const gui = new dat.GUI({ width: 400 });
+const gui = new dat.GUI({width : 400});
 
 // GLOBALS
 
 let raycaster = new THREE.Raycaster();
-let objects = [],
-  rooms = [];
+let objects = [],rooms = [];
 let intersects = null;
 let count = 6;
-let flag = true,
-  toggleHover = true;
+let flag = true;
 let currentIntersect = null;
-const parameters = {};
-parameters.handleHover = function () {
-  if (toggleHover) {
-    for (let i = 1; i < count; i++) {
-      scene.remove(objects[i]);
-    }
-    toggleHover = false;
-  }
-  else{
-    for (let i = 1; i < count; i++) {
-      scene.add(objects[i]);
-    }
-
-    toggleHover = true;
-  }
-};
 
 // LOADER
 
 const manager = new THREE.LoadingManager();
+
 
 const dracoLoader = new DRACOLoader(manager);
 let decoderPath = "https://www.gstatic.com/draco/v1/decoders/";
@@ -81,9 +64,10 @@ var camera = new THREE.OrthographicCamera(
   1000
 );
 
-camera.position.x = 2;
-camera.position.y = 12.88;
-camera.position.z = 1.127;
+
+camera.position.x = 3;
+camera.position.y = 14.88;
+camera.position.z = 7.127;
 scene.add(camera);
 
 // renderer
@@ -94,19 +78,22 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-window.addEventListener("resize", () => {
-  sizes.width = sizes.width;
-  sizes.height = sizes.width;
+window.addEventListener(
+  "resize",
+  () => {
+    sizes.width = sizes.width;
+    sizes.height = sizes.width;
 
-  // update camera
+    // update camera
 
-  camera.aspect = sizes.width / sizes.height;
-  camera.updateProjectionMatrix();
+    camera.aspect = sizes.width / sizes.height;
+    camera.updateProjectionMatrix();
 
-  // update renderer
+    // update renderer
 
-  renderer.setSize(sizes.width, sizes.height);
-});
+    renderer.setSize(sizes.width, sizes.height);
+  }
+);
 
 // renderer
 
@@ -115,7 +102,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setClearColor(0x2e2e2e);
 
-// MOUSE CLICK EVENT
+
 
 // lights
 
@@ -139,7 +126,7 @@ const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.maxDistance = 10;
 controls.minDistance = 0;
-controls.maxPolarAngle = Math.PI / 2;
+controls.maxPolarAngle = Math.PI/2;
 
 /* FUNCTION CALLS */
 
@@ -156,11 +143,9 @@ function resolve(gltf) {
   gltf.scene.scale.set(0.5, 0.5, 0.5);
   var model = gltf.scene;
   model.traverse((o) => {
-    if (o.isMesh) {
-      o.userData.originalMaterial = o.material
-      o.castShadow = true;
-      o.receiveShadow = true;
-    }
+    if (o.isMesh) o.userData.originalMaterial = o.material;
+    o.castShadow = true;
+    o.receiveShadow = true;
   });
   rooms.push(model);
 }
@@ -177,11 +162,6 @@ gltfLoader.load("/models/BUILDING/bathroom2.gltf", resolve);
 
 function createFloor(floor) {
   for (const room of rooms) {
-    room.traverse((o) => {
-      if (o.isMesh) {
-        o.material.color = o.material.color.clone();
-      }
-    });
     floor.add(room);
   }
 }
@@ -194,109 +174,15 @@ function createBuilding() {
   floor.castShadow = true;
   createFloor(floor);
   for (let currFloor = 0; currFloor < count; currFloor++, height += 1.7) {
-    const fl = floor.clone();
+    const fl = floor.clone();   
     fl.position.set(0, height, 0);
+
     scene.add(fl);
     objects.push(fl);
   }
 }
 
-// INTERACTION FUNCTIONS
-
-function changeFloorColor() {
-  for (let i = 1; i < count; i++) {
-    objects[i].visible = false;
-  }
-
-  for (const floor of objects) {
-    for (const model of floor.children) {
-      model.traverse((o) => {
-        if (o.isMesh) {
-          if (o.isMesh) o.material.color.set("white");
-        }
-      });
-    }
-  }
-
-  if (intersects.length) {
-    currentIntersect = intersects[0];
-  } else {
-    currentIntersect = null;
-  }
-
-  if (currentIntersect && currentIntersect !== null) {
-    let idx = null;
-    let p = currentIntersect.object.parent;
-    while (1) {
-      idx = objects.indexOf(p);
-      if (idx !== null && idx !== -1) {
-        break;
-      }
-      p = p.parent;
-    }
-
-    for (let i = 1; i <= idx; i++) {
-      objects[i].visible = true;
-    }
-
-    if (idx >= 0 && idx < 6) {
-      for (const model of objects[idx].children) {
-        model.traverse((o) => {
-          if (o.isMesh) o.material.color.set("#56887D");
-        });
-      }
-    }
-  }
-}
-
-function changeRoomColor() {
-
-  for (const floor of objects) {
-    for (const model of floor.children) {
-      model.traverse((o) => {
-        if (o.isMesh) o.material.color.set("white")
-      });
-    }
-  }
-
-  if (intersects.length) {
-    currentIntersect = intersects[0];
-  } else {
-    currentIntersect = null;
-  }
-
-  if (
-    currentIntersect &&
-    currentIntersect !== null
-  ) {
-    let idx = null;
-    if (currentIntersect) {
-      let p = currentIntersect.object.parent;
-      while (1) {
-        idx = (objects[0].children).indexOf(p);
-        if (idx !== null && idx !== -1) {
-          break;
-        }
-        p = p.parent;
-      }
-
-      // traversing floor and changing color of floor
-
-      if (rooms[idx] && rooms[idx] !== null) {
-        for (const model of rooms[idx].children) {
-          model.traverse((o) => {
-            if (o.isMesh) o.material.color.set("#C6E2FF")
-          });
-        }
-      }
-    }
-  }
-}
-
-// GUI
-
-gui.add(controls, "enabled").name("ORBIT CONTROLS");
-gui.add(parameters, "handleHover").name("TOGGLE FLOOR VIEW/ROOM VIEW");
+gui.add(controls, 'enabled').name("ORBIT CONTROLS");
 
 // manager function calls
 
@@ -317,19 +203,13 @@ manager.onLoad = () => {
   }
   const animate = () => {
     // updating controls
-    controls.target.set(-3, 3, -0.63);
+    // controls.target.set(-3, 5 , 0.63);
     controls.update();
 
     // raycaster from mouse to camera
 
     raycaster.setFromCamera(mouse, camera);
     intersects = raycaster.intersectObjects(scene.children, true);
-
-    if (flag && toggleHover) {
-      changeFloorColor();
-    } else {
-      changeRoomColor();
-    }
 
     // checking objects intersecting
 
