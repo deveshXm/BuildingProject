@@ -176,11 +176,6 @@ gltfLoader.load("/models/BUILDING/bathroom2.gltf", resolve);
 
 function createFloor(floor) {
   for (const room of rooms) {
-    room.traverse((o) => {
-      if (o.isMesh) {
-        o.material.color = o.material.color.clone();
-      }
-    });
     floor.add(room);
   }
 }
