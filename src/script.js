@@ -206,7 +206,7 @@ function changeFloorColor() {
     for (const model of floor.children) {
       model.traverse((o) => {
         if (o.isMesh) {
-          if (o.isMesh) o.material.color.set("white");
+          o.material.color.set("white");
         }
       });
     }
