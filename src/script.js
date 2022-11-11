@@ -26,8 +26,7 @@ parameters.handleHover = function () {
       scene.remove(objects[i]);
     }
     toggleHover = false;
-  }
-  else{
+  } else {
     for (let i = 1; i < count; i++) {
       scene.add(objects[i]);
     }
@@ -172,6 +171,31 @@ gltfLoader.load("/models/BUILDING/bathroom2.gltf", resolve);
 
 /* ***************************************** */
 
+// POINTS
+
+const points = [
+  {
+    position: new THREE.Vector3(-4, 0.5, 0),
+    element: document.querySelector(".point-0"),
+  },
+  {
+    position: new THREE.Vector3(-6, 0.5, -2.5),
+    element: document.querySelector(".point-1"),
+  },
+  {
+    position: new THREE.Vector3(-4, 0.5, -2.5),
+    element: document.querySelector(".point-2"),
+  },
+  {
+    position: new THREE.Vector3(-3, 0.5, -2.5),
+    element: document.querySelector(".point-3"),
+  },
+  {
+    position: new THREE.Vector3(-1.5, 0.5, -2.5),
+    element: document.querySelector(".point-4"),
+  },
+];
+
 // FLOOR
 
 function createFloor(floor) {
@@ -244,11 +268,10 @@ function changeFloorColor() {
 }
 
 function changeRoomColor() {
-
   for (const floor of objects) {
     for (const model of floor.children) {
       model.traverse((o) => {
-        if (o.isMesh) o.material.color.set("white")
+        if (o.isMesh) o.material.color.set("white");
       });
     }
   }
@@ -259,15 +282,12 @@ function changeRoomColor() {
     currentIntersect = null;
   }
 
-  if (
-    currentIntersect &&
-    currentIntersect !== null
-  ) {
+  if (currentIntersect && currentIntersect !== null) {
     let idx = null;
     if (currentIntersect) {
       let p = currentIntersect.object.parent;
       while (1) {
-        idx = (objects[0].children).indexOf(p);
+        idx = objects[0].children.indexOf(p);
         if (idx !== null && idx !== -1) {
           break;
         }
@@ -279,7 +299,7 @@ function changeRoomColor() {
       if (rooms[idx] && rooms[idx] !== null) {
         for (const model of rooms[idx].children) {
           model.traverse((o) => {
-            if (o.isMesh) o.material.color.set("#C6E2FF")
+            if (o.isMesh) o.material.color.set("#C6E2FF");
           });
         }
       }
@@ -319,10 +339,20 @@ manager.onLoad = () => {
     raycaster.setFromCamera(mouse, camera);
     intersects = raycaster.intersectObjects(scene.children, true);
 
+  
+
     if (flag && toggleHover) {
       changeFloorColor();
     } else {
       changeRoomColor();
+      for (const point of points) {
+        const screenPosition = point.position.clone();
+        screenPosition.project(camera);
+        const translateX = screenPosition.x * sizes.width * 0.5;
+        const translateY = -screenPosition.y * sizes.height * 0.5;
+  
+        point.element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+      }
     }
 
     // checking objects intersecting
