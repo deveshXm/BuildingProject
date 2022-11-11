@@ -160,14 +160,14 @@ body {
   opacity: 0;
 }
 
-.point.visible .label {
+.point.visible .label { 
   transform: scale(1, 1);
 }
 
 .button {
   position: absolute;
   cursor: pointer;
-  background-color: #4caf50; /* Green */
+  background-color: #3676ec; /* Green */
   border: none;
   color: white;
   padding: 15px 32px;
@@ -187,3 +187,16 @@ body {
   top: 30px;
   left: 30px;
 }
+
+.info{
+  position: absolute;
+  cursor: help;
+  top: 90px;
+  left: 30px;
+  height: 70px;
+  width: 300px;
+  text-align: center;
+  font-size: 15px;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+

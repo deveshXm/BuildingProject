@@ -21,6 +21,8 @@ let flag = true,
   toggleHover = true;
 let currentIntersect = null;
 const parameters = {};
+let planeUUID = null;
+
 parameters.handleHover = function () {
   if (toggleHover) {
     for (let i = 1; i < count; i++) {
@@ -117,7 +119,7 @@ window.addEventListener("resize", () => {
 renderer.setSize(sizes.width, sizes.height);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.setClearColor(0x2e2e2e);
+renderer.setClearColor("#87CEEB");
 
 // MOUSE CLICK EVENT
 
@@ -177,7 +179,7 @@ gltfLoader.load("/models/BUILDING/bathroom2.gltf", resolve);
 // button event listener
 
 window.addEventListener("keydown", function (e) {
-  if (e.key === "S" || e.key=== "s") {
+  if (e.key === "S" || e.key === "s") {
     //checks whether the pressed key is "S"
     controls.enabled = !controls.enabled;
   }
@@ -211,6 +213,18 @@ const points = [
     element: document.querySelector(".point-4"),
   },
 ];
+
+// GROUND
+
+const planeGeometry = new THREE.PlaneBufferGeometry(100, 100);
+const planeMaterial = new THREE.MeshStandardMaterial({ color: "#567d46" });
+
+const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+plane.receiveShadow = true;
+plane.rotation.x = -Math.PI / 2;
+plane.position.y = -0.2;
+planeUUID = plane.uuid;
+scene.add(plane);
 
 // FLOOR
 
@@ -257,31 +271,32 @@ function changeFloorColor() {
   } else {
     currentIntersect = null;
   }
-
   if (currentIntersect && currentIntersect !== null) {
-    let idx = null;
-    let p = currentIntersect.object.parent;
-    while (1) {
-      idx = objects.indexOf(p);
-      if (idx !== null && idx !== -1) {
-        break;
+    if (currentIntersect.object.uuid !== planeUUID) {
+      let idx = null;
+      let p = currentIntersect.object.parent;
+      while (1) {
+        idx = objects.indexOf(p);
+        if (idx !== null && idx !== -1) {
+          break;
+        }
+        p = p.parent;
       }
-      p = p.parent;
-    }
 
-    let i = 1;
-    if (idx > 0) {
-      i = idx;
-    }
-    for (i; i < count; i++) {
-      objects[i].visible = false;
-    }
+      let i = 1;
+      if (idx > 0) {
+        i = idx;
+      }
+      for (i; i < count; i++) {
+        objects[i].visible = false;
+      }
 
-    if (idx >= 0 && idx < 6) {
-      for (const model of objects[idx].children) {
-        model.traverse((o) => {
-          if (o.isMesh) o.material.color.set("#ACE396");
-        });
+      if (idx >= 0 && idx < 6) {
+        for (const model of objects[idx].children) {
+          model.traverse((o) => {
+            if (o.isMesh) o.material.color.set("#C6E2FF");
+          });
+        }
       }
     }
   }
@@ -303,8 +318,8 @@ function changeRoomColor() {
   }
 
   if (currentIntersect && currentIntersect !== null) {
-    let idx = null;
-    if (currentIntersect) {
+    if (currentIntersect.object.uuid !== planeUUID) {
+      let idx = null;
       let p = currentIntersect.object.parent;
       while (1) {
         idx = objects[0].children.indexOf(p);
