@@ -362,7 +362,6 @@ manager.onLoad = () => {
   const animate = () => {
     // updating controls
     controls.update();
-    console.log(camera.position);
 
     // raycaster from mouse to camera
 
