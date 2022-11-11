@@ -179,15 +179,15 @@ const points = [
     element: document.querySelector(".point-0"),
   },
   {
-    position: new THREE.Vector3(-6, 0.5, -2.5),
+    position: new THREE.Vector3(-5.5, 0.5, -2.5),
     element: document.querySelector(".point-1"),
   },
   {
-    position: new THREE.Vector3(-4, 0.5, -2.5),
+    position: new THREE.Vector3(-3.8, 0.5, -2.5),
     element: document.querySelector(".point-2"),
   },
   {
-    position: new THREE.Vector3(-3, 0.5, -2.5),
+    position: new THREE.Vector3(-2.5, 0.5, -2.5),
     element: document.querySelector(".point-3"),
   },
   {
@@ -343,6 +343,10 @@ manager.onLoad = () => {
 
     if (flag && toggleHover) {
       changeFloorColor();
+
+      for (const point of points) {
+        point.element.style.display = 'none';
+      }
     } else {
       changeRoomColor();
       for (const point of points) {
@@ -352,6 +356,7 @@ manager.onLoad = () => {
         const translateY = -screenPosition.y * sizes.height * 0.5;
   
         point.element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+        point.element.style.display = 'block';
       }
     }
 

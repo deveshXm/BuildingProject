@@ -110,6 +110,7 @@ body {
 /* LABEL */
 
 .point {
+  display: none;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -136,7 +137,7 @@ body {
   position: absolute;
   top: 30px;
   left: -120px;
-  width: 200px;
+  width: 80px;
   padding: 20px;
   border-radius: 4px;
   background: #00000077;
@@ -153,6 +154,10 @@ body {
 
 .point:hover .text {
   opacity: 1;
+}
+
+.point:hover .label{
+  opacity: 0;
 }
 
 .point.visible .label {
