@@ -3,22 +3,49 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
+import * as dat from "dat.gui";
 
+// GUI
+
+const gui = new dat.GUI({ width: 400 });
 
 // GLOBALS
+
 let raycaster = new THREE.Raycaster();
-let objects = [], rooms = [];
+let objects = [],
+  rooms = [];
 let intersects = null;
 let count = 6;
-let flag = true;
+let flag = true,
+  toggleHover = true;
 let currentIntersect = null;
+const parameters = {};
+parameters.handleHover = function () {
+  if (toggleHover) {
+    for (let i = 1; i < count; i++) {
+      scene.remove(objects[i]);
+    }
+    toggleHover = false;
+  } else {
+    for (let i = 1; i < count; i++) {
+      scene.add(objects[i]);
+    }
 
-const dracoLoader = new DRACOLoader();
+    toggleHover = true;
+  }
+};
 
+// LOADER
+
+const manager = new THREE.LoadingManager();
+
+const dracoLoader = new DRACOLoader(manager);
 let decoderPath = "https://www.gstatic.com/draco/v1/decoders/";
 dracoLoader.setDecoderPath(decoderPath);
-const gltfLoader = new GLTFLoader();
+const gltfLoader = new GLTFLoader(manager);
 gltfLoader.setDRACOLoader(dracoLoader);
+
+// MOUSE
 
 const mouse = new THREE.Vector2();
 window.addEventListener("mousemove", (event) => {
@@ -42,11 +69,6 @@ const scene = new THREE.Scene();
 
 // camera
 
-/* PERSPECTIVE */
-
-// const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
-// camera.position.set(, 2, 2);
-
 /* ORTHOGRAPHIC */
 
 var camera = new THREE.OrthographicCamera(
@@ -59,10 +81,8 @@ var camera = new THREE.OrthographicCamera(
 );
 
 camera.position.x = 2;
-camera.position.y = 2;
-camera.position.z = 2;
-camera.lookAt(scene.position);
-
+camera.position.y = 12.88;
+camera.position.z = 1.127;
 scene.add(camera);
 
 // renderer
@@ -85,7 +105,6 @@ window.addEventListener("resize", () => {
   // update renderer
 
   renderer.setSize(sizes.width, sizes.height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
 // renderer
@@ -95,12 +114,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setClearColor(0x2e2e2e);
 
-camera.position.set(10, 10, 10);
-// camera.updateProjectionMatrix();
-
-// orbit controls
-// const controls = new OrbitControls(camera, canvas);
-// controls.enableDamping = true;
+// MOUSE CLICK EVENT
 
 // lights
 
@@ -118,114 +132,94 @@ directionalLight.castShadow = true;
 const targetObject = new THREE.Object3D();
 scene.add(targetObject);
 
+// ORBIT CONTROLS
+
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.maxDistance = 10;
+controls.minDistance = 0;
+controls.maxPolarAngle = Math.PI / 2;
+
+/* FUNCTION CALLS */
+
+// CSS LOADER FUNCTION
+
+function onTransitionEnd(event) {
+  const element = event.target;
+  element.remove();
+}
+
+// LOADING
+
+function resolve(gltf) {
+  gltf.scene.scale.set(0.5, 0.5, 0.5);
+  var model = gltf.scene;
+  model.traverse((o) => {
+    if (o.isMesh) {
+      o.castShadow = true;
+      o.receiveShadow = true;
+    }
+  });
+  rooms.push(model);
+}
+
+gltfLoader.load("/models/BUILDING/living.gltf", resolve);
+gltfLoader.load("/models/BUILDING/bedroom.gltf", resolve);
+gltfLoader.load("/models/BUILDING/bedroom2.gltf", resolve);
+gltfLoader.load("/models/BUILDING/bathroom.gltf", resolve);
+gltfLoader.load("/models/BUILDING/bathroom2.gltf", resolve);
+
 /* ***************************************** */
+
+// POINTS
+
+const points = [
+  {
+    position: new THREE.Vector3(-4, 0.5, 0),
+    element: document.querySelector(".point-0"),
+  },
+  {
+    position: new THREE.Vector3(-5.5, 0.5, -2.5),
+    element: document.querySelector(".point-1"),
+  },
+  {
+    position: new THREE.Vector3(-3.8, 0.5, -2.5),
+    element: document.querySelector(".point-2"),
+  },
+  {
+    position: new THREE.Vector3(-2.5, 0.5, -2.5),
+    element: document.querySelector(".point-3"),
+  },
+  {
+    position: new THREE.Vector3(-1.5, 0.5, -2.5),
+    element: document.querySelector(".point-4"),
+  },
+];
 
 // FLOOR
 
 function createFloor(floor) {
-  gltfLoader.load("/models/BUILDING/living.gltf", (gltf) => {
-    gltf.scene.scale.set(0.5, 0.5, 0.5);
-    var model = gltf.scene;
-    console.log(gltf.scene);
-    model.traverse((o) => {
-      if (o.isMesh)
-        o.userData.originalMaterial = o.material
-    });
-    gltf.scene.traverse(function (child) {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-    console.log(gltf.scene);
-    console.log("done")
-    rooms.push(gltf.scene);
-    floor.add(gltf.scene);
-  });
-  gltfLoader.load("/models/BUILDING/bedroom.gltf", (gltf) => {
-    gltf.scene.scale.set(0.5, 0.5, 0.5);
-    var model = gltf.scene;
-    console.log(gltf.scene);
-    model.traverse((o) => {
-      if (o.isMesh) o.userData.originalMaterial = o.material
-    });
-    gltf.scene.traverse(function (child) {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-    rooms.push(gltf.scene);
-    floor.add(gltf.scene);
-  });
-  gltfLoader.load("/models/BUILDING/bedroom2.gltf", (gltf) => {
-    gltf.scene.scale.set(0.5, 0.5, 0.5);
-    var model = gltf.scene;
-    console.log(gltf.scene);
-    model.traverse((o) => {
-      if (o.isMesh) o.userData.originalMaterial = o.material
-    });
-    gltf.scene.traverse(function (child) {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-    rooms.push(gltf.scene);
-    floor.add(gltf.scene);
-  });
-  gltfLoader.load("/models/BUILDING/bathroom.gltf", (gltf) => {
-    gltf.scene.scale.set(0.5, 0.5, 0.5);
-    var model = gltf.scene;
-    console.log(gltf.scene);
-    model.traverse((o) => {
-      if (o.isMesh) o.userData.originalMaterial = o.material
-    });
-    gltf.scene.traverse(function (child) {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-    rooms.push(gltf.scene);
-    floor.add(gltf.scene);
-  });
-  gltfLoader.load("/models/BUILDING/bathroom2.gltf", (gltf) => {
-    gltf.scene.scale.set(0.5, 0.5, 0.5);
-    var model = gltf.scene;
-    console.log(gltf.scene);
-    model.traverse((o) => {
-      if (o.isMesh) o.userData.originalMaterial = o.material
-    });
-    gltf.scene.traverse(function (child) {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-    rooms.push(gltf.scene);
-    floor.add(gltf.scene);
-  });
-}
-
-function createBuilding() {
-  let height = -0.1;
-
-  // BUILDING
-
-  for (let currFloor = 0; currFloor < count; currFloor++, height += 1.7) {
-    const floor = new THREE.Group();
-    createFloor(floor);
-    floor.position.set(8, height, 6);
-    floor.castShadow = true;
-    scene.add(floor);
-    objects.push(floor);
+  for (const room of rooms) {
+    floor.add(room);
   }
 }
 
-// // BUILDING MOUSE EVENTS
+// BUILDING
 
-console.log(objects)
+function createBuilding() {
+  let height = -0.1;
+  const floor = new THREE.Group();
+  floor.castShadow = true;
+  createFloor(floor);
+  for (let currFloor = 0; currFloor < count; currFloor++, height += 1.7) {
+    const fl = floor.clone();
+    fl.position.set(0, height, 0);
+    scene.add(fl);
+    objects.push(fl);
+  }
+}
+
+// INTERACTION FUNCTIONS
 
 function changeFloorColor() {
   for (let i = 1; i < count; i++) {
@@ -235,7 +229,9 @@ function changeFloorColor() {
   for (const floor of objects) {
     for (const model of floor.children) {
       model.traverse((o) => {
-        if (o.isMesh) o.material = o.userData.originalMaterial
+        if (o.isMesh) {
+          o.material.color.set("white");
+        }
       });
     }
   }
@@ -245,52 +241,37 @@ function changeFloorColor() {
   } else {
     currentIntersect = null;
   }
-  console.log(currentIntersect)
 
-  // remove scene & create new
-
-  if (currentIntersect && currentIntersect !== null && currentIntersect !== undefined) {
+  if (currentIntersect && currentIntersect !== null) {
     let idx = null;
-    if (currentIntersect) {
-      let p = currentIntersect.object.parent;
-      while (1) {
-        idx = objects.indexOf(p);
-        if (idx !== null && idx !== undefined && idx !== -1) {
-          break;
-        }
-        p = p.parent;
+    let p = currentIntersect.object.parent;
+    while (1) {
+      idx = objects.indexOf(p);
+      if (idx !== null && idx !== -1) {
+        break;
       }
+      p = p.parent;
+    }
 
-      console.log(idx);
+    for (let i = 1; i <= idx; i++) {
+      objects[i].visible = true;
+    }
 
-      // changing visibility of floor
-
-      for (let i = 1; i <= idx; i++) {
-        objects[i].visible = true;
-      }
-
-      // traversing floor and changing color of floor
-
-      if (objects[idx] && objects[idx] !== undefined && objects[idx] !== null) {
-        for (const model of objects[idx].children) {
-          model.traverse((o) => {
-            var newMaterial = new THREE.MeshNormalMaterial();
-            if (o.isMesh) o.material = newMaterial;
-          });
-        }
+    if (idx >= 0 && idx < 6) {
+      for (const model of objects[idx].children) {
+        model.traverse((o) => {
+          if (o.isMesh) o.material.color.set("#56887D");
+        });
       }
     }
   }
 }
 
 function changeRoomColor() {
-
-  // default material
-
   for (const floor of objects) {
     for (const model of floor.children) {
       model.traverse((o) => {
-        if (o.isMesh) o.material = o.userData.originalMaterial
+        if (o.isMesh) o.material.color.set("white");
       });
     }
   }
@@ -300,115 +281,90 @@ function changeRoomColor() {
   } else {
     currentIntersect = null;
   }
-  console.log(currentIntersect)
 
-
-  if (currentIntersect && currentIntersect !== null && currentIntersect !== undefined) {
+  if (currentIntersect && currentIntersect !== null) {
     let idx = null;
     if (currentIntersect) {
       let p = currentIntersect.object.parent;
       while (1) {
-        idx = rooms.indexOf(p);
-        if (idx !== null && idx !== undefined && idx !== -1) {
+        idx = objects[0].children.indexOf(p);
+        if (idx !== null && idx !== -1) {
           break;
         }
         p = p.parent;
       }
 
-      console.log(idx);
-
       // traversing floor and changing color of floor
 
-      if (rooms[idx] && rooms[idx] !== undefined && rooms[idx] !== null) {
+      if (rooms[idx] && rooms[idx] !== null) {
         for (const model of rooms[idx].children) {
           model.traverse((o) => {
-            var newMaterial = new THREE.MeshNormalMaterial();
-            if (o.isMesh) o.material = newMaterial;
+            if (o.isMesh) o.material.color.set("#C6E2FF");
           });
         }
       }
     }
   }
-
-
 }
 
-//Click function to change scene
+// GUI
 
-window.addEventListener("click", () => {
-  if (flag) {
-    if (currentIntersect !== null) {
-      deleteGroup();
-    }
-    camera.zoom = 1.8;
-    camera.updateProjectionMatrix();
+gui.add(controls, "enabled").name("ORBIT CONTROLS");
+gui.add(parameters, "handleHover").name("TOGGLE FLOOR VIEW/ROOM VIEW");
 
-    changeToFloorView();
-    flag = false;
-  } else {
-    if (currentIntersect !== null) {
-      deleteGroup();
-    }
-    camera.zoom = 1;
-    camera.updateProjectionMatrix();
-    createBuilding();
-    flag = true;
-  }
-});
+// manager function calls
 
-// // FLOOR MOUSE EVENTS
-
-function changeToFloorView() {
-  const floor = new THREE.Group();
-  createFloor(floor);
-  floor.position.set(5, 0, 3);
-  console.log(floor);
-  objects.push(floor);
-  scene.add(floor);
-}
-
-// // DELETE ENTITY
-
-function deleteGroup() {
-  for (const group of objects) {
-    scene.remove(group);
-  }
-
-  objects = [];
-}
-
-// // function calls
-
-if (flag) {
-  createBuilding();
-}
-
-/* ************************************************************ */
-
-// animate fucntion
-
-const animate = () => {
-
-  // camera.updateProjectionMatrix();
-
-  // controls.update();
-  // raycaster from mouse to camera
-
-  raycaster.setFromCamera(mouse, camera);
-
-  // checking objects intersecting
-  intersects = raycaster.intersectObjects(scene.children, true);
-
-  // changing color and visibility
-
-  if (flag) {
-    changeFloorColor();
-  } else {
-    changeRoomColor();
-  }
-
-  renderer.render(scene, camera);
-  window.requestAnimationFrame(animate);
+manager.onProgress = (url, itemsLoaded, itemsTotal) => {
+  const loadingScreen = document.getElementById("count");
+  loadingScreen.innerHTML = Math.floor((itemsLoaded / itemsTotal) * 100) + "%";
 };
 
-animate();
+manager.onLoad = () => {
+  const loadingScreen = document.getElementById("loading-screen");
+  loadingScreen.classList.add("fade-out");
+
+  // optional: remove loader from DOM via event listener
+  loadingScreen.addEventListener("transitionend", onTransitionEnd);
+
+  if (flag) {
+    createBuilding();
+  }
+  const animate = () => {
+    // updating controls
+    controls.target.set(-3, 3, -0.63);
+    controls.update();
+
+    // raycaster from mouse to camera
+
+    raycaster.setFromCamera(mouse, camera);
+    intersects = raycaster.intersectObjects(scene.children, true);
+
+  
+
+    if (flag && toggleHover) {
+      changeFloorColor();
+
+      for (const point of points) {
+        point.element.style.display = 'none';
+      }
+    } else {
+      changeRoomColor();
+      for (const point of points) {
+        const screenPosition = point.position.clone();
+        screenPosition.project(camera);
+        const translateX = screenPosition.x * sizes.width * 0.5;
+        const translateY = -screenPosition.y * sizes.height * 0.5;
+  
+        point.element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+        point.element.style.display = 'block';
+      }
+    }
+
+    // checking objects intersecting
+
+    renderer.render(scene, camera);
+    window.requestAnimationFrame(animate);
+  };
+
+  animate();
+};
