@@ -146,6 +146,7 @@ controls.minDistance = 0;
 controls.maxPolarAngle = Math.PI / 2;
 controls.target = new THREE.Vector3(-2, 0, 1);
 controls.enabled = true;
+controls.enablePan = true;
 
 /* FUNCTION CALLS */
 
@@ -184,9 +185,17 @@ window.addEventListener("keydown", function (e) {
     controls.enabled = !controls.enabled;
   }
 });
+window.addEventListener("keydown", function (e) {
+  if (e.key === "P" || e.key === "p") {
+    //checks whether the pressed key is "S"
+    controls.enablePan = !controls.enablePan;
+  }
+});
 document
   .getElementById("btn2")
   .addEventListener("click", parameters.handleHover);
+
+
 /* ***************************************** */
 
 // POINTS
