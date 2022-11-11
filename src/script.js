@@ -38,13 +38,11 @@ parameters.handleHover = function () {
   }
 
   if (toggleHover) {
-    camera.position.x = -3.74;
-    camera.position.y = 17.29;
-    camera.position.z = -10.2054;
+    controls.reset();
+    camera.position.set(-3.74 , 17.29 , -10.254);
   } else {
-    camera.position.x = -12;
-    camera.position.y = 12;
-    camera.position.z = -7;
+    controls.reset();
+    camera.position.set(-12 , 12 , -7);
   }
 };
 
@@ -87,9 +85,7 @@ const camera = new THREE.PerspectiveCamera(
   1,
   1000
 );
-camera.position.x = -3.74;
-camera.position.y = 17.29;
-camera.position.z = -10.2054;
+camera.position.set(-12 , 12 , -7);
 scene.add(camera);
 
 // renderer
@@ -140,7 +136,6 @@ directionalLight.castShadow = true;
 // ORBIT CONTROLS
 
 const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
 controls.maxDistance = 30;
 controls.minDistance = 0;
 controls.maxPolarAngle = Math.PI / 2;
@@ -369,8 +364,8 @@ manager.onLoad = () => {
     createBuilding();
   }
   const animate = () => {
-    // updating controls
     controls.update();
+    // updating controls
 
     // raycaster from mouse to camera
 
