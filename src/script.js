@@ -8,6 +8,7 @@ import * as dat from "dat.gui";
 // GUI
 
 const gui = new dat.GUI({ width: 400 });
+gui.hide();
 
 // GLOBALS
 
@@ -33,6 +34,16 @@ parameters.handleHover = function () {
 
     toggleHover = true;
   }
+
+  if (toggleHover) {
+    camera.position.x = -3.74;
+    camera.position.y = 17.29;
+    camera.position.z = -10.2054;
+  } else {
+    camera.position.x = -12;
+    camera.position.y = 12;
+    camera.position.z = -7;
+  }
 };
 
 // LOADER
@@ -57,7 +68,6 @@ const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
 };
-const aspect = sizes.width / sizes.height;
 
 // canvas
 
@@ -69,20 +79,15 @@ const scene = new THREE.Scene();
 
 // camera
 
-/* ORTHOGRAPHIC */
-
-var camera = new THREE.OrthographicCamera(
-  -7 * aspect,
-  7 * aspect,
-  7,
-  -7,
-  0.1,
+const camera = new THREE.PerspectiveCamera(
+  55,
+  sizes.width / sizes.height,
+  1,
   1000
 );
-
-camera.position.x = 2;
-camera.position.y = 12.88;
-camera.position.z = 1.127;
+camera.position.x = -3.74;
+camera.position.y = 17.29;
+camera.position.z = -10.2054;
 scene.add(camera);
 
 // renderer
@@ -94,8 +99,8 @@ renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 window.addEventListener("resize", () => {
-  sizes.width = sizes.width;
-  sizes.height = sizes.width;
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
 
   // update camera
 
@@ -129,16 +134,16 @@ directionalLight.shadowCameraBottom = -10;
 directionalLight.shadowCameraLeft = 20;
 directionalLight.shadowCameraRight = -20;
 directionalLight.castShadow = true;
-const targetObject = new THREE.Object3D();
-scene.add(targetObject);
 
 // ORBIT CONTROLS
 
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.maxDistance = 10;
+controls.maxDistance = 30;
 controls.minDistance = 0;
 controls.maxPolarAngle = Math.PI / 2;
+controls.target = new THREE.Vector3(-2, 0, 1);
+controls.enabled = true;
 
 /* FUNCTION CALLS */
 
@@ -169,6 +174,17 @@ gltfLoader.load("/models/BUILDING/bedroom2.gltf", resolve);
 gltfLoader.load("/models/BUILDING/bathroom.gltf", resolve);
 gltfLoader.load("/models/BUILDING/bathroom2.gltf", resolve);
 
+// button event listener
+
+window.addEventListener("keydown", function (e) {
+  if (e.key === "S" || e.key=== "s") {
+    //checks whether the pressed key is "S"
+    controls.enabled = !controls.enabled;
+  }
+});
+document
+  .getElementById("btn2")
+  .addEventListener("click", parameters.handleHover);
 /* ***************************************** */
 
 // POINTS
@@ -222,8 +238,8 @@ function createBuilding() {
 // INTERACTION FUNCTIONS
 
 function changeFloorColor() {
-  for (let i = 1; i < count; i++) {
-    objects[i].visible = false;
+  for (let i = 0; i < count; i++) {
+    objects[i].visible = true;
   }
 
   for (const floor of objects) {
@@ -253,14 +269,18 @@ function changeFloorColor() {
       p = p.parent;
     }
 
-    for (let i = 1; i <= idx; i++) {
-      objects[i].visible = true;
+    let i = 1;
+    if (idx > 0) {
+      i = idx;
+    }
+    for (i; i < count; i++) {
+      objects[i].visible = false;
     }
 
     if (idx >= 0 && idx < 6) {
       for (const model of objects[idx].children) {
         model.traverse((o) => {
-          if (o.isMesh) o.material.color.set("#56887D");
+          if (o.isMesh) o.material.color.set("#ACE396");
         });
       }
     }
@@ -307,11 +327,6 @@ function changeRoomColor() {
   }
 }
 
-// GUI
-
-gui.add(controls, "enabled").name("ORBIT CONTROLS");
-gui.add(parameters, "handleHover").name("TOGGLE FLOOR VIEW/ROOM VIEW");
-
 // manager function calls
 
 manager.onProgress = (url, itemsLoaded, itemsTotal) => {
@@ -331,21 +346,19 @@ manager.onLoad = () => {
   }
   const animate = () => {
     // updating controls
-    controls.target.set(-3, 3, -0.63);
     controls.update();
+    console.log(camera.position);
 
     // raycaster from mouse to camera
 
     raycaster.setFromCamera(mouse, camera);
     intersects = raycaster.intersectObjects(scene.children, true);
 
-  
-
     if (flag && toggleHover) {
       changeFloorColor();
 
       for (const point of points) {
-        point.element.style.display = 'none';
+        point.element.style.display = "none";
       }
     } else {
       changeRoomColor();
@@ -354,9 +367,9 @@ manager.onLoad = () => {
         screenPosition.project(camera);
         const translateX = screenPosition.x * sizes.width * 0.5;
         const translateY = -screenPosition.y * sizes.height * 0.5;
-  
+
         point.element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
-        point.element.style.display = 'block';
+        point.element.style.display = "block";
       }
     }
 
