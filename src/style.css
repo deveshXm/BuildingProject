@@ -160,44 +160,55 @@ body {
   opacity: 0;
 }
 
-.point.visible .label { 
+.point.visible .label {
   transform: scale(1, 1);
 }
 
-.button {
+.options {
   position: absolute;
-  cursor: pointer;
-  background-color: #3676ec; /* Green */
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  text-align: center;
-}
-
-.button:hover{
-  background-color: #ffffff;
-  color: black;
-}
-
-#btn2 {
+  display: flex;
+  flex-direction: column;
   top: 30px;
   left: 30px;
 }
 
-.info{
+.button {
+  width: 100px;
+  height: 110px;
+  border: none;
+  margin-bottom: 10px;
+}
+
+.button:hover {
+  cursor: pointer;
+  scale: 1.1;
+  transition: linear 100ms;
+}
+
+#btn1 {
+  background: url("../static/button/SLICE.png") no-repeat scroll 0 0 transparent;
+  background-size: cover;
+}
+
+#btn2 {
+  background: url("../static/button/ORBIT.png") no-repeat scroll 0 0 transparent;
+  background-size: cover;
+}
+
+#btn3 {
+  background: url("../static/button/PAN.png") no-repeat scroll 0 0 transparent;
+  background-size: cover;
+}
+
+.info {
   position: absolute;
   cursor: help;
   top: 90px;
   left: 30px;
-  height:fit-content;
+  height: fit-content;
   width: fit-content;
   padding: 10px;
   text-align: center;
   font-size: 15px;
   background-color: rgba(255, 255, 255, 0.5);
 }
-

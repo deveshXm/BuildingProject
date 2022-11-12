@@ -39,10 +39,10 @@ parameters.handleHover = function () {
 
   if (toggleHover) {
     controls.reset();
-    camera.position.set(-3.74 , 17.29 , -10.254);
+    camera.position.set(-3.74, 17.29, -10.254);
   } else {
     controls.reset();
-    camera.position.set(-12 , 12 , -7);
+    camera.position.set(-12, 12, -7);
   }
 };
 
@@ -85,7 +85,7 @@ const camera = new THREE.PerspectiveCamera(
   1,
   1000
 );
-camera.position.set(-12 , 12 , -7);
+camera.position.set(-12, 12, -7);
 scene.add(camera);
 
 // renderer
@@ -173,23 +173,15 @@ gltfLoader.load("/models/BUILDING/bathroom.gltf", resolve);
 gltfLoader.load("/models/BUILDING/bathroom2.gltf", resolve);
 
 // button event listener
-
-window.addEventListener("keydown", function (e) {
-  if (e.key === "S" || e.key === "s") {
-    //checks whether the pressed key is "S"
-    controls.enabled = !controls.enabled;
-  }
-});
-window.addEventListener("keydown", function (e) {
-  if (e.key === "P" || e.key === "p") {
-    //checks whether the pressed key is "S"
-    controls.enablePan = !controls.enablePan;
-  }
-});
 document
-  .getElementById("btn2")
+  .getElementById("btn1")
   .addEventListener("click", parameters.handleHover);
-
+document.getElementById("btn2").addEventListener("click", () => {
+  controls.enabled = !controls.enabled;
+});
+document.getElementById("btn3").addEventListener("click", () => {
+  controls.enablePan = !controls.enablePan;
+});
 
 /* ***************************************** */
 
