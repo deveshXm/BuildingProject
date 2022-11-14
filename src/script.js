@@ -177,7 +177,7 @@ document
   .getElementById("btn1")
   .addEventListener("click", parameters.handleHover);
 document.getElementById("btn2").addEventListener("click", () => {
-  controls.enabled = !controls.enabled;
+  controls.enableRotate = !controls.enableRotate;
 });
 document.getElementById("btn3").addEventListener("click", () => {
   controls.enablePan = !controls.enablePan;
