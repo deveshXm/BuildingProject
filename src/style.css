@@ -173,8 +173,8 @@ body {
 }
 
 .button {
-  width: 82px;
-  height: 82px;
+  width: 75px;
+  height: 85px;
   border: none;
   margin-bottom: 10px;
 }
@@ -187,17 +187,18 @@ body {
 
 #btn1 {
   background: url("../static/button/SLICE.png") no-repeat scroll 0 0 transparent;
-  background-size: cover;
+  background-size: contain;
 }
 
 #btn2 {
   background: url("../static/button/ORBIT.png") no-repeat scroll 0 0 transparent;
-  background-size: cover;
+  filter: invert(0%);
+  background-size: contain;
 }
 
 #btn3 {
   background: url("../static/button/PAN.png") no-repeat scroll 0 0 transparent;
-  background-size: cover;
+  background-size: contain;
 }
 
 .info {

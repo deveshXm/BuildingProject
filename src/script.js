@@ -14,7 +14,7 @@ gui.hide();
 
 let raycaster = new THREE.Raycaster();
 let objects = [],
-  rooms = [];
+rooms = [];
 let intersects = null;
 let count = 6;
 let flag = true,
@@ -22,6 +22,9 @@ let flag = true,
 let currentIntersect = null;
 const parameters = {};
 let planeUUID = null;
+let btn1 = false;
+let btn2 = false;
+let btn3 = false;
 
 parameters.handleHover = function () {
   if (toggleHover) {
@@ -43,6 +46,14 @@ parameters.handleHover = function () {
   } else {
     controls.reset();
     camera.position.set(-12, 12, -7);
+  }
+  if(!btn1){
+    document.getElementById("btn1").style.filter = "invert(100%)";
+    btn1 = true;
+  }
+  else{
+    document.getElementById("btn1").style.filter = "invert(0%)";
+    btn1  = false;
   }
 };
 
@@ -178,9 +189,25 @@ document
   .addEventListener("click", parameters.handleHover);
 document.getElementById("btn2").addEventListener("click", () => {
   controls.enableRotate = !controls.enableRotate;
+  if(!btn2){
+    document.getElementById("btn2").style.filter = "invert(100%)";
+    btn2 = true;
+  }
+  else{
+    document.getElementById("btn2").style.filter = "invert(0%)";
+    btn2  = false;
+  }
 });
 document.getElementById("btn3").addEventListener("click", () => {
   controls.enablePan = !controls.enablePan;
+  if(!btn3){
+    document.getElementById("btn3").style.filter = "invert(100%)";
+    btn3 = true;
+  }
+  else{
+    document.getElementById("btn3").style.filter = "invert(0%)";
+    btn3  = false;
+  }
 });
 
 /* ***************************************** */
