@@ -25,6 +25,8 @@ let planeUUID = null;
 let btn1 = false;
 let btn2 = false;
 let btn3 = false;
+let defaultPath1 = [];
+let defaultRect1 = [];
 
 parameters.handleHover = function () {
   if (toggleHover) {
@@ -47,13 +49,32 @@ parameters.handleHover = function () {
     controls.reset();
     camera.position.set(-12, 12, -7);
   }
+  let rect = document.getElementById("btn1").getElementsByTagName("rect")
+  let path = document.getElementById("btn1").getElementsByTagName("path")
+
   if(!btn1){
-    document.getElementById("btn1").style.filter = "invert(100%)";
+    for(let i = 0 ; i < rect.length; i++){
+      defaultRect1.push(rect[i].getAttribute("fill"));
+      rect[i].setAttribute("fill" ,"#8B0000");
+    }      
+    for(let i = 0 ; i < path.length; i++){
+      defaultPath1.push(path[i].getAttribute("fill"));
+      path[i].setAttribute("fill" ,"white");
+    }      
     btn1 = true;
+    console.log(defaultPath1)
+    console.log(defaultRect1)
   }
   else{
-    document.getElementById("btn1").style.filter = "invert(0%)";
-    btn1  = false;
+    for(let i = 0 ; i < rect.length; i++){
+      rect[i].setAttribute("fill" ,defaultRect1[i]);
+    }      
+    for(let i = 0 ; i < path.length; i++){
+      path[i].setAttribute("fill" ,defaultPath1[i]);
+    }      
+    btn1 = false;
+    defaultPath1 = [];
+    defaultRect1 = [];
   }
 };
 
@@ -184,29 +205,69 @@ gltfLoader.load("/models/BUILDING/bathroom.gltf", resolve);
 gltfLoader.load("/models/BUILDING/bathroom2.gltf", resolve);
 
 // button event listener
+
+
+let defaultRect2 = [];
+let defaultPath2 = [];
+let defaultRect3 = [];
+let defaultPath3 = [];
 document
   .getElementById("btn1")
   .addEventListener("click", parameters.handleHover);
 document.getElementById("btn2").addEventListener("click", () => {
   controls.enableRotate = !controls.enableRotate;
+  let rect = document.getElementById("btn2").getElementsByTagName("rect")
+  let path = document.getElementById("btn2").getElementsByTagName("path")
+
   if(!btn2){
-    document.getElementById("btn2").style.filter = "invert(100%)";
+    for(let i = 0 ; i < rect.length; i++){
+      defaultRect2.push(rect[i].getAttribute("fill"));
+      rect[i].setAttribute("fill" ,"#8B0000");
+    }      
+    for(let i = 0 ; i < path.length; i++){
+      defaultPath2.push(path[i].getAttribute("fill"));
+      path[i].setAttribute("fill" ,"white");
+    }      
     btn2 = true;
   }
   else{
-    document.getElementById("btn2").style.filter = "invert(0%)";
-    btn2  = false;
+    for(let i = 0 ; i < rect.length; i++){
+      rect[i].setAttribute("fill" ,defaultRect2[i]);
+    }      
+    for(let i = 0 ; i < path.length; i++){
+      path[i].setAttribute("fill" ,defaultPath2[i]);
+    }      
+    btn2 = false;
+    defaultPath2 = [];
+    defaultRect2 = [];
   }
 });
 document.getElementById("btn3").addEventListener("click", () => {
   controls.enablePan = !controls.enablePan;
+  let rect = document.getElementById("btn3").getElementsByTagName("rect")
+  let path = document.getElementById("btn3").getElementsByTagName("path")
+
   if(!btn3){
-    document.getElementById("btn3").style.filter = "invert(100%)";
+    for(let i = 0 ; i < rect.length; i++){
+      defaultRect3.push(rect[i].getAttribute("fill"));
+      rect[i].setAttribute("fill" ,"#8B0000");
+    }      
+    for(let i = 0 ; i < path.length; i++){
+      defaultPath3.push(path[i].getAttribute("fill"));
+      path[i].setAttribute("fill" ,"white");
+    }      
     btn3 = true;
   }
   else{
-    document.getElementById("btn3").style.filter = "invert(0%)";
-    btn3  = false;
+    for(let i = 0 ; i < rect.length; i++){
+      rect[i].setAttribute("fill" ,defaultRect3[i]);
+    }      
+    for(let i = 0 ; i < path.length; i++){
+      path[i].setAttribute("fill" ,defaultPath3[i]);
+    }      
+    btn3 = false;
+    defaultPath3 = [];
+    defaultRect3 = [];
   }
 });
 

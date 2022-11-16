@@ -177,28 +177,14 @@ body {
   height: 85px;
   border: none;
   margin-bottom: 10px;
+  background: transparent ;
+  background-size: contain;
 }
 
 .button:hover {
   cursor: pointer;
   scale: 1.1;
   transition: linear 100ms;
-}
-
-#btn1 {
-  background: url("../static/button/SLICE.png") no-repeat scroll 0 0 transparent;
-  background-size: contain;
-}
-
-#btn2 {
-  background: url("../static/button/ORBIT.png") no-repeat scroll 0 0 transparent;
-  filter: invert(0%);
-  background-size: contain;
-}
-
-#btn3 {
-  background: url("../static/button/PAN.png") no-repeat scroll 0 0 transparent;
-  background-size: contain;
 }
 
 .info {
