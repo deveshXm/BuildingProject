@@ -41,13 +41,15 @@ parameters.handleHover = function () {
 
     toggleHover = true;
   }
+  if(toggleHover){
+    camera.zoom = 1;
+    camera.lookAt(0,0,0);
+    camera.updateProjectionMatrix()
 
-  if (toggleHover) {
-    controls.reset();
-    camera.position.set(-3.74, 17.29, -10.254);
-  } else {
-    controls.reset();
-    camera.position.set(-12, 12, -7);
+  }else{
+    camera.zoom = 3;
+    camera.lookAt(-3.8, 0.5, -1.2)    
+    camera.updateProjectionMatrix()
   }
   let rect = document.getElementById("btn1").getElementsByTagName("rect")
   let path = document.getElementById("btn1").getElementsByTagName("path")
@@ -62,8 +64,6 @@ parameters.handleHover = function () {
       path[i].setAttribute("fill" ,"white");
     }      
     btn1 = true;
-    console.log(defaultPath1)
-    console.log(defaultRect1)
   }
   else{
     for(let i = 0 ; i < rect.length; i++){
@@ -444,7 +444,6 @@ manager.onLoad = () => {
     createBuilding();
   }
   const animate = () => {
-    controls.update();
     // updating controls
 
     // raycaster from mouse to camera
