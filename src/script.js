@@ -273,7 +273,7 @@ document.getElementById("btn3").addEventListener("click", () => {
   }
 });
 
-document.addEventListener("click", () => {
+document.addEventListener("dblclick", () => {
   if (!toggleRoom) {
     if (idx !== null && idx >= 0) {
       scene.remove(objects[0]);
