@@ -14,7 +14,8 @@ gui.hide();
 
 let raycaster = new THREE.Raycaster();
 let objects = [],
-rooms = [];
+  rooms = [],
+  ROOMS = [];
 let intersects = null;
 let count = 6;
 let flag = true,
@@ -22,59 +23,63 @@ let flag = true,
 let currentIntersect = null;
 const parameters = {};
 let planeUUID = null;
-let btn1 = false;
-let btn2 = false;
-let btn3 = false;
-let defaultPath1 = [];
-let defaultRect1 = [];
+let btn1 = false,
+  btn2 = false,
+  btn3 = false;
+let defaultPath1 = [],
+  defaultRect1 = [];
+let toggleRoom = false;
+let idx = null;
 
-parameters.handleHover = function () {
-  if (toggleHover) {
-    for (let i = 1; i < count; i++) {
-      scene.remove(objects[i]);
-    }
-    toggleHover = false;
+parameters.handleHover = function (event) {
+  if (toggleRoom) {
+    event.preventDefault();
   } else {
-    for (let i = 1; i < count; i++) {
-      scene.add(objects[i]);
+    if (toggleHover) {
+      for (let i = 1; i < count; i++) {
+        scene.remove(objects[i]);
+      }
+      toggleHover = false;
+    } else {
+      for (let i = 1; i < count; i++) {
+        scene.add(objects[i]);
+      }
+
+      toggleHover = true;
     }
+    if (toggleHover) {
+      camera.zoom = 1;
+      camera.lookAt(0, 0, 0);
+      camera.updateProjectionMatrix();
+    } else {
+      camera.zoom = 3;
+      camera.lookAt(-3.8, 0.5, -1.2);
+      camera.updateProjectionMatrix();
+    }
+    let rect = document.getElementById("btn1").getElementsByTagName("rect");
+    let path = document.getElementById("btn1").getElementsByTagName("path");
 
-    toggleHover = true;
-  }
-  if(toggleHover){
-    camera.zoom = 1;
-    camera.lookAt(0,0,0);
-    camera.updateProjectionMatrix()
-
-  }else{
-    camera.zoom = 3;
-    camera.lookAt(-3.8, 0.5, -1.2)    
-    camera.updateProjectionMatrix()
-  }
-  let rect = document.getElementById("btn1").getElementsByTagName("rect")
-  let path = document.getElementById("btn1").getElementsByTagName("path")
-
-  if(!btn1){
-    for(let i = 0 ; i < rect.length; i++){
-      defaultRect1.push(rect[i].getAttribute("fill"));
-      rect[i].setAttribute("fill" ,"#8B0000");
-    }      
-    for(let i = 0 ; i < path.length; i++){
-      defaultPath1.push(path[i].getAttribute("fill"));
-      path[i].setAttribute("fill" ,"white");
-    }      
-    btn1 = true;
-  }
-  else{
-    for(let i = 0 ; i < rect.length; i++){
-      rect[i].setAttribute("fill" ,defaultRect1[i]);
-    }      
-    for(let i = 0 ; i < path.length; i++){
-      path[i].setAttribute("fill" ,defaultPath1[i]);
-    }      
-    btn1 = false;
-    defaultPath1 = [];
-    defaultRect1 = [];
+    if (!btn1) {
+      for (let i = 0; i < rect.length; i++) {
+        defaultRect1.push(rect[i].getAttribute("fill"));
+        rect[i].setAttribute("fill", "#8B0000");
+      }
+      for (let i = 0; i < path.length; i++) {
+        defaultPath1.push(path[i].getAttribute("fill"));
+        path[i].setAttribute("fill", "white");
+      }
+      btn1 = true;
+    } else {
+      for (let i = 0; i < rect.length; i++) {
+        rect[i].setAttribute("fill", defaultRect1[i]);
+      }
+      for (let i = 0; i < path.length; i++) {
+        path[i].setAttribute("fill", defaultPath1[i]);
+      }
+      btn1 = false;
+      defaultPath1 = [];
+      defaultRect1 = [];
+    }
   }
 };
 
@@ -206,7 +211,6 @@ gltfLoader.load("/models/BUILDING/bathroom2.gltf", resolve);
 
 // button event listener
 
-
 let defaultRect2 = [];
 let defaultPath2 = [];
 let defaultRect3 = [];
@@ -216,27 +220,26 @@ document
   .addEventListener("click", parameters.handleHover);
 document.getElementById("btn2").addEventListener("click", () => {
   controls.enableRotate = !controls.enableRotate;
-  let rect = document.getElementById("btn2").getElementsByTagName("rect")
-  let path = document.getElementById("btn2").getElementsByTagName("path")
+  let rect = document.getElementById("btn2").getElementsByTagName("rect");
+  let path = document.getElementById("btn2").getElementsByTagName("path");
 
-  if(!btn2){
-    for(let i = 0 ; i < rect.length; i++){
+  if (!btn2) {
+    for (let i = 0; i < rect.length; i++) {
       defaultRect2.push(rect[i].getAttribute("fill"));
-      rect[i].setAttribute("fill" ,"#8B0000");
-    }      
-    for(let i = 0 ; i < path.length; i++){
+      rect[i].setAttribute("fill", "#8B0000");
+    }
+    for (let i = 0; i < path.length; i++) {
       defaultPath2.push(path[i].getAttribute("fill"));
-      path[i].setAttribute("fill" ,"white");
-    }      
+      path[i].setAttribute("fill", "white");
+    }
     btn2 = true;
-  }
-  else{
-    for(let i = 0 ; i < rect.length; i++){
-      rect[i].setAttribute("fill" ,defaultRect2[i]);
-    }      
-    for(let i = 0 ; i < path.length; i++){
-      path[i].setAttribute("fill" ,defaultPath2[i]);
-    }      
+  } else {
+    for (let i = 0; i < rect.length; i++) {
+      rect[i].setAttribute("fill", defaultRect2[i]);
+    }
+    for (let i = 0; i < path.length; i++) {
+      path[i].setAttribute("fill", defaultPath2[i]);
+    }
     btn2 = false;
     defaultPath2 = [];
     defaultRect2 = [];
@@ -244,30 +247,43 @@ document.getElementById("btn2").addEventListener("click", () => {
 });
 document.getElementById("btn3").addEventListener("click", () => {
   controls.enablePan = !controls.enablePan;
-  let rect = document.getElementById("btn3").getElementsByTagName("rect")
-  let path = document.getElementById("btn3").getElementsByTagName("path")
+  let rect = document.getElementById("btn3").getElementsByTagName("rect");
+  let path = document.getElementById("btn3").getElementsByTagName("path");
 
-  if(!btn3){
-    for(let i = 0 ; i < rect.length; i++){
+  if (!btn3) {
+    for (let i = 0; i < rect.length; i++) {
       defaultRect3.push(rect[i].getAttribute("fill"));
-      rect[i].setAttribute("fill" ,"#8B0000");
-    }      
-    for(let i = 0 ; i < path.length; i++){
+      rect[i].setAttribute("fill", "#8B0000");
+    }
+    for (let i = 0; i < path.length; i++) {
       defaultPath3.push(path[i].getAttribute("fill"));
-      path[i].setAttribute("fill" ,"white");
-    }      
+      path[i].setAttribute("fill", "white");
+    }
     btn3 = true;
-  }
-  else{
-    for(let i = 0 ; i < rect.length; i++){
-      rect[i].setAttribute("fill" ,defaultRect3[i]);
-    }      
-    for(let i = 0 ; i < path.length; i++){
-      path[i].setAttribute("fill" ,defaultPath3[i]);
-    }      
+  } else {
+    for (let i = 0; i < rect.length; i++) {
+      rect[i].setAttribute("fill", defaultRect3[i]);
+    }
+    for (let i = 0; i < path.length; i++) {
+      path[i].setAttribute("fill", defaultPath3[i]);
+    }
     btn3 = false;
     defaultPath3 = [];
     defaultRect3 = [];
+  }
+});
+
+document.addEventListener("click", () => {
+  if (!toggleRoom) {
+    if (idx !== null && idx >= 0) {
+      scene.remove(objects[0]);
+      scene.add(rooms[idx]);
+      toggleRoom = true;
+    }
+  } else {
+    scene.add(objects[0]);
+    scene.remove(rooms[idx]);
+    toggleRoom = false;
   }
 });
 
@@ -387,6 +403,7 @@ function changeFloorColor() {
 }
 
 function changeRoomColor() {
+  idx = null;
   for (const floor of objects) {
     for (const model of floor.children) {
       model.traverse((o) => {
@@ -403,7 +420,6 @@ function changeRoomColor() {
 
   if (currentIntersect && currentIntersect !== null) {
     if (currentIntersect.object.uuid !== planeUUID) {
-      let idx = null;
       let p = currentIntersect.object.parent;
       while (1) {
         idx = objects[0].children.indexOf(p);
@@ -425,6 +441,8 @@ function changeRoomColor() {
     }
   }
 }
+
+// zoom into rooms
 
 // manager function calls
 
@@ -458,17 +476,25 @@ manager.onLoad = () => {
         point.element.style.display = "none";
       }
     } else {
-      changeRoomColor();
-      for (const point of points) {
-        const screenPosition = point.position.clone();
-        screenPosition.project(camera);
-        const translateX = screenPosition.x * sizes.width * 0.5;
-        const translateY = -screenPosition.y * sizes.height * 0.5;
+      if (toggleRoom) {
+        for (const point of points) {
+          point.element.style.display = "none";
+        }
+      } else {
+        changeRoomColor();
+        for (const point of points) {
+          const screenPosition = point.position.clone();
+          screenPosition.project(camera);
+          const translateX = screenPosition.x * sizes.width * 0.5;
+          const translateY = -screenPosition.y * sizes.height * 0.5;
 
-        point.element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
-        point.element.style.display = "block";
+          point.element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`;
+          point.element.style.display = "block";
+        }
       }
     }
+
+    console.log(idx);
 
     // checking objects intersecting
 
