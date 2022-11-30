@@ -158,10 +158,10 @@ renderer.setClearColor("#87CEEB");
 
 // lights
 
-const ambientLight = new THREE.AmbientLight("#ffffff", 0.5);
+const ambientLight = new THREE.AmbientLight("#ffffff", 1);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight("#ffffff", 1.5);
+const directionalLight = new THREE.DirectionalLight("#ffffff", 1);
 scene.add(directionalLight);
 directionalLight.position.set(10, 10, -10);
 directionalLight.shadowCameraTop = 20;
@@ -197,7 +197,7 @@ function resolve(gltf) {
   model.traverse((o) => {
     if (o.isMesh) {
       o.castShadow = true;
-      o.receiveShadow = true;
+      // o.receiveShadow = true;
     }
   });
   rooms.push(model);
