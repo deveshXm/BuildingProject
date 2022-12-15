@@ -38,12 +38,12 @@ parameters.handleHover = function (event) {
     event.preventDefault();
   } else {
     if (toggleHover) {
-      for (let i = 1; i < count; i++) {
+      for (let i = 1; i < objects.length; i++) {
         scene.remove(objects[i]);
       }
       toggleHover = false;
     } else {
-      for (let i = 1; i < count; i++) {
+      for (let i = 1; i < objects.length; i++) {
         scene.add(objects[i]);
       }
 
@@ -402,7 +402,7 @@ function createBuilding() {
 // INTERACTION FUNCTIONS
 
 function changeFloorColor() {
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < objects.length; i++) {
     objects[i].visible = true;
   }
 
@@ -437,7 +437,7 @@ function changeFloorColor() {
       if (idx > 0) {
         i = idx;
       }
-      for (i; i < count; i++) {
+      for (i; i < objects.length; i++) {
         objects[i].visible = false;
       }
 
