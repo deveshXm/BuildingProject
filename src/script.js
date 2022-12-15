@@ -330,11 +330,11 @@ const grassRoughnessTexture = textureLoader.load(
   "/textures/grass/roughness.jpg"
 );
 
-grassColorTexture.repeat.set(10, 10);
-grassAmbientOcclusionTexture.repeat.set(10, 10);
-grassNormalTexture.repeat.set(10, 10);
-grassHeightTexture.repeat.set(10, 10);
-grassRoughnessTexture.repeat.set(10, 10);
+grassColorTexture.repeat.set(1000, 1000);
+grassAmbientOcclusionTexture.repeat.set(1000, 1000);
+grassNormalTexture.repeat.set(1000, 1000);
+grassHeightTexture.repeat.set(1000, 1000);
+grassRoughnessTexture.repeat.set(1000, 1000);
 
 grassColorTexture.wrapS = THREE.RepeatWrapping;
 grassAmbientOcclusionTexture.wrapS = THREE.RepeatWrapping;
@@ -351,7 +351,7 @@ const planeGeometry = new THREE.PlaneBufferGeometry(100, 100);
 const planeMaterial = new THREE.MeshStandardMaterial({ color: "#567d46" });
 
 const plane = new THREE.Mesh(
-  new THREE.PlaneBufferGeometry(50, 50),
+  new THREE.PlaneBufferGeometry(1000, 1000),
   new THREE.MeshStandardMaterial({
     map: grassColorTexture,
     metalness: 0,
