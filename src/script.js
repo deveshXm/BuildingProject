@@ -5,6 +5,8 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import * as dat from "dat.gui";
 
+
+var textureLoader = new THREE.TextureLoader();
 // GUI
 
 const gui = new dat.GUI({ width: 400 });
@@ -158,7 +160,7 @@ renderer.setClearColor("#87CEEB");
 
 // lights
 
-const ambientLight = new THREE.AmbientLight("#ffffff", 1);
+const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
 scene.add(ambientLight);
 
 const directionalLight = new THREE.DirectionalLight("#ffffff", 1);
@@ -169,6 +171,7 @@ directionalLight.shadowCameraBottom = -10;
 directionalLight.shadowCameraLeft = 20;
 directionalLight.shadowCameraRight = -20;
 directionalLight.castShadow = true;
+
 
 // ORBIT CONTROLS
 
@@ -197,7 +200,7 @@ function resolve(gltf) {
   model.traverse((o) => {
     if (o.isMesh) {
       o.castShadow = true;
-      // o.receiveShadow = true;
+      o.receiveShadow = true;
     }
   });
   rooms.push(model);
@@ -316,12 +319,59 @@ const points = [
 
 // GROUND
 
+var material = new THREE.MeshBasicMaterial();
+const grassColorTexture = textureLoader.load("/textures/grass/color.jpg");
+const grassAmbientOcclusionTexture = textureLoader.load(
+  "/textures/grass/ambientOcclusion.jpg"
+);
+const grassHeightTexture = textureLoader.load("/textures/grass/height.png");
+const grassNormalTexture = textureLoader.load("/textures/grass/normal.jpg");
+const grassRoughnessTexture = textureLoader.load(
+  "/textures/grass/roughness.jpg"
+);
+
+grassColorTexture.repeat.set(10, 10);
+grassAmbientOcclusionTexture.repeat.set(10, 10);
+grassNormalTexture.repeat.set(10, 10);
+grassHeightTexture.repeat.set(10, 10);
+grassRoughnessTexture.repeat.set(10, 10);
+
+grassColorTexture.wrapS = THREE.RepeatWrapping;
+grassAmbientOcclusionTexture.wrapS = THREE.RepeatWrapping;
+grassHeightTexture.wrapS = THREE.RepeatWrapping;
+grassNormalTexture.wrapS = THREE.RepeatWrapping;
+grassRoughnessTexture.wrapS = THREE.RepeatWrapping;
+
+grassColorTexture.wrapT = THREE.RepeatWrapping;
+grassAmbientOcclusionTexture.wrapT = THREE.RepeatWrapping;
+grassHeightTexture.wrapT = THREE.RepeatWrapping;
+grassNormalTexture.wrapT = THREE.RepeatWrapping;
+grassRoughnessTexture.wrapT = THREE.RepeatWrapping;
 const planeGeometry = new THREE.PlaneBufferGeometry(100, 100);
 const planeMaterial = new THREE.MeshStandardMaterial({ color: "#567d46" });
 
-const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+const plane = new THREE.Mesh(
+  new THREE.PlaneBufferGeometry(50, 50),
+  new THREE.MeshStandardMaterial({
+    map: grassColorTexture,
+    metalness: 0,
+    transparent: true,
+    aoMap: grassAmbientOcclusionTexture,
+    displacementMap: grassHeightTexture,
+    roughnessMap: grassRoughnessTexture,
+    normalMap: grassNormalTexture,
+    displacementScale: 0.1,
+  })
+);
+
 plane.receiveShadow = true;
-plane.rotation.x = -Math.PI / 2;
+
+plane.geometry.setAttribute(
+  "uv2",
+  new THREE.Float32BufferAttribute(plane.geometry.attributes.uv.array, 2)
+);
+
+plane.rotation.x = -Math.PI * 0.5;
 plane.position.y = -0.2;
 planeUUID = plane.uuid;
 scene.add(plane);
@@ -494,8 +544,7 @@ manager.onLoad = () => {
       }
     }
 
-    console.log(idx);
-
+    console.log()
     // checking objects intersecting
 
     renderer.render(scene, camera);
