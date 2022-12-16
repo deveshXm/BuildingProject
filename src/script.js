@@ -6,14 +6,14 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 
 let planeUUID = null;
 
-// GLOBALS
 function onTransitionEnd(event) {
   const element = event.target;
   element.remove();
 }
 
+// GLOBALS
+
 let idx = null;
-let count = 6;
 let intersects = null;
 let currentIntersect = null;
 let raycaster = new THREE.Raycaster();
@@ -21,12 +21,20 @@ let camera, scene, manager, mouse, renderer, points, sizes, controls;
 
 
 const model1 = {
+  count: 6,
   rooms: [],
   objects: []
 }
 
+const model2 = {
+  count: 6,
+  rooms: [],
+  objects:[]
+}
+
 // CURRENT MODEL GLOBALS
 
+let currentCount = model1.count;
 let currentRooms = model1.rooms;
 let currentObjects = model1.objects;
 
@@ -34,10 +42,6 @@ let currentObjects = model1.objects;
 
 let flag = true;
 let toggleHover = true;
-
-
-
-
 let toggleRoom = false;
 
 
@@ -330,7 +334,7 @@ controlButtons(currentObjects);
 function ground() {
 
   var textureLoader = new THREE.TextureLoader();
-  
+
   const grassColorTexture = textureLoader.load("/textures/grass/color.jpg");
   const grassAmbientOcclusionTexture = textureLoader.load(
     "/textures/grass/ambientOcclusion.jpg"
@@ -396,7 +400,7 @@ function createFloor(floor) {
 
 // BUILDING
 
-function createBuilding(objects) {
+function createBuilding(count ,objects) {
   let height = -0.1;
   const floor = new THREE.Group();
   floor.castShadow = true;
@@ -517,7 +521,7 @@ manager.onLoad = () => {
   loadingScreen.addEventListener("transitionend", onTransitionEnd);
 
   if (flag) {
-    createBuilding(currentObjects);
+    createBuilding(currentCount ,currentObjects);
   }
   const animate = () => {
     // updating controls
