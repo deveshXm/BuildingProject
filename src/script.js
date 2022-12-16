@@ -27,16 +27,17 @@ const model1 = {
 }
 
 const model2 = {
-  count: 6,
+  count: 5,
   rooms: [],
   objects:[]
 }
 
 // CURRENT MODEL GLOBALS
 
-let currentCount = model1.count;
-let currentRooms = model1.rooms;
-let currentObjects = model1.objects;
+let currentmodel = model2;
+let currentCount = currentmodel.count;
+let currentRooms = currentmodel.rooms;
+let currentObjects = currentmodel.objects;
 
 // BUTTON FLAGS AND TOGGLES
 
@@ -146,23 +147,41 @@ function loadModels() {
   const gltfLoader = new GLTFLoader(manager);
   gltfLoader.setDRACOLoader(dracoLoader);
 
-  function resolve(gltf) {
-    gltf.scene.scale.set(0.5, 0.5, 0.5);
-    var model = gltf.scene;
-    model.traverse((o) => {
-      if (o.isMesh) {
-        o.castShadow = true;
-        o.receiveShadow = true;
-      }
-    });
-    (model1.rooms).push(model);
+  function higher(current){
+    function resolve(gltf) {
+      gltf.scene.scale.set(0.5, 0.5, 0.5);
+      var model = gltf.scene;
+      model.traverse((o) => {
+        if (o.isMesh) {
+          o.castShadow = true;
+          o.receiveShadow = true;
+        }
+      });
+      (current.rooms).push(model);
+    }
+
+    return resolve;
+
   }
 
-  gltfLoader.load("/models/BUILDING/living.gltf", resolve);
-  gltfLoader.load("/models/BUILDING/bedroom.gltf", resolve);
-  gltfLoader.load("/models/BUILDING/bedroom2.gltf", resolve);
-  gltfLoader.load("/models/BUILDING/bathroom.gltf", resolve);
-  gltfLoader.load("/models/BUILDING/bathroom2.gltf", resolve);
+  // MODEL 1
+
+  let current = model1;
+
+  gltfLoader.load("/models/BUILDING/living.gltf",   higher(current));
+  gltfLoader.load("/models/BUILDING/bedroom.gltf",  higher(current));
+  gltfLoader.load("/models/BUILDING/bedroom2.gltf", higher(current));
+  gltfLoader.load("/models/BUILDING/bathroom.gltf", higher(current));
+  gltfLoader.load("/models/BUILDING/bathroom2.gltf",higher(current));
+
+  // MODEL 2
+
+  current = model2;
+  gltfLoader.load("/models/BUILDING/living.gltf",   higher(current));
+  gltfLoader.load("/models/BUILDING/bedroom.gltf",  higher(current));
+  gltfLoader.load("/models/BUILDING/bedroom2.gltf", higher(current));
+  gltfLoader.load("/models/BUILDING/bathroom.gltf", higher(current));
+  gltfLoader.load("/models/BUILDING/bathroom2.gltf",higher(current));
 }
 
 loadModels();
@@ -289,12 +308,12 @@ function controlButtons(objects) {
     if (!toggleRoom) {
       if (idx !== null && idx >= 0) {
         scene.remove(objects[0]);
-        scene.add((model1.rooms)[idx]);
+        scene.add((currentmodel.rooms)[idx]);
         toggleRoom = true;
       }
     } else {
       scene.add(objects[0]);
-      scene.remove((model1.rooms)[idx]);
+      scene.remove((currentmodel.rooms)[idx]);
       toggleRoom = false;
     }
   });
@@ -393,7 +412,7 @@ function ground() {
 ground();
 
 function createFloor(floor) {
-  for (const room of model1.rooms) {
+  for (const room of currentmodel.rooms) {
     floor.add(room);
   }
 }
@@ -525,8 +544,6 @@ manager.onLoad = () => {
   }
   const animate = () => {
     // updating controls
-
-    // raycaster from mouse to camera
 
     raycaster.setFromCamera(mouse, camera);
     intersects = raycaster.intersectObjects(scene.children, true);

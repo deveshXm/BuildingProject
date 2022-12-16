@@ -199,3 +199,31 @@ body {
   font-size: 15px;
   background-color: rgba(255, 255, 255, 0.5);
 }
+
+.floor-options{
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10%;
+  padding: 20px;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  
+}
+
+.floor-options button{
+  width: 100px;
+  height: 50px;
+  border-radius: 10%;
+  background-color: rgb(4, 239, 208);
+  color:black;
+  font-size: 20px;
+}
+
+.floor-options button:hover{
+  background-color: red ;
+  color: white;
+  cursor: pointer;
+}
