@@ -242,11 +242,13 @@ function controlButtons(objects) {
       event.preventDefault();
     } else {
       if (toggleHover) {
+        document.getElementById("floors").style.display = "none";
         for (let i = 1; i < currentmodel.objects.length; i++) {
           scene.remove(currentmodel.objects[i]);
         }
         toggleHover = false;
       } else {
+        document.getElementById("floors").style.display = "";
         for (let i = 1; i < currentmodel.objects.length; i++) {
           scene.add(currentmodel.objects[i]);
         }
