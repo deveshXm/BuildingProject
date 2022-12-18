@@ -17,34 +17,74 @@ let idx = null;
 let intersects = null;
 let currentIntersect = null;
 let raycaster = new THREE.Raycaster();
-let camera, scene, manager, mouse, renderer, points, sizes, controls;
-
+let camera, scene, manager, mouse, renderer, sizes, controls;
 
 const model1 = {
   count: 6,
   rooms: [],
-  objects: []
-}
+  objects: [],
+
+  points: [
+    {
+      position: new THREE.Vector3(-4, 0.5, 0),
+      element: document.querySelector(".point-0"),
+    },
+    {
+      position: new THREE.Vector3(-5.5, 0.5, -2.5),
+      element: document.querySelector(".point-1"),
+    },
+    {
+      position: new THREE.Vector3(-3.8, 0.5, -2.5),
+      element: document.querySelector(".point-2"),
+    },
+    {
+      position: new THREE.Vector3(-2.5, 0.5, -2.5),
+      element: document.querySelector(".point-3"),
+    },
+    {
+      position: new THREE.Vector3(-1.5, 0.5, -2.5),
+      element: document.querySelector(".point-4"),
+    },
+  ],
+};
 
 const model2 = {
   count: 5,
   rooms: [],
-  objects:[]
-}
+  objects: [],
+  points: [
+    {
+      position: new THREE.Vector3(-4, 0.5, 0),
+      element: document.querySelector(".point-0"),
+    },
+    {
+      position: new THREE.Vector3(-5.5, 0.5, -2.5),
+      element: document.querySelector(".point-1"),
+    },
+    {
+      position: new THREE.Vector3(-3.8, 0.5, -2.5),
+      element: document.querySelector(".point-2"),
+    },
+    {
+      position: new THREE.Vector3(-2.5, 0.5, -2.5),
+      element: document.querySelector(".point-3"),
+    },
+    {
+      position: new THREE.Vector3(-1.5, 0.5, -2.5),
+      element: document.querySelector(".point-4"),
+    },
+  ],
+};
 
 // CURRENT MODEL GLOBALS
 
-let currentmodel = model2;
-let currentCount = currentmodel.count;
-let currentRooms = currentmodel.rooms;
-let currentObjects = currentmodel.objects;
+let currentmodel = model1;
 
 // BUTTON FLAGS AND TOGGLES
 
 let flag = true;
 let toggleHover = true;
 let toggleRoom = false;
-
 
 function init() {
   // LOADER
@@ -147,7 +187,7 @@ function loadModels() {
   const gltfLoader = new GLTFLoader(manager);
   gltfLoader.setDRACOLoader(dracoLoader);
 
-  function higher(current){
+  function higher(current) {
     function resolve(gltf) {
       gltf.scene.scale.set(0.5, 0.5, 0.5);
       var model = gltf.scene;
@@ -157,31 +197,30 @@ function loadModels() {
           o.receiveShadow = true;
         }
       });
-      (current.rooms).push(model);
+      current.rooms.push(model);
     }
 
     return resolve;
-
   }
 
   // MODEL 1
 
   let current = model1;
 
-  gltfLoader.load("/models/BUILDING/living.gltf",   higher(current));
-  gltfLoader.load("/models/BUILDING/bedroom.gltf",  higher(current));
+  gltfLoader.load("/models/BUILDING/living.gltf", higher(current));
+  gltfLoader.load("/models/BUILDING/bedroom.gltf", higher(current));
   gltfLoader.load("/models/BUILDING/bedroom2.gltf", higher(current));
   gltfLoader.load("/models/BUILDING/bathroom.gltf", higher(current));
-  gltfLoader.load("/models/BUILDING/bathroom2.gltf",higher(current));
+  gltfLoader.load("/models/BUILDING/bathroom2.gltf", higher(current));
 
   // MODEL 2
 
   current = model2;
-  gltfLoader.load("/models/BUILDING/living.gltf",   higher(current));
-  gltfLoader.load("/models/BUILDING/bedroom.gltf",  higher(current));
+  gltfLoader.load("/models/BUILDING/living.gltf", higher(current));
+  gltfLoader.load("/models/BUILDING/bedroom.gltf", higher(current));
   gltfLoader.load("/models/BUILDING/bedroom2.gltf", higher(current));
   gltfLoader.load("/models/BUILDING/bathroom.gltf", higher(current));
-  gltfLoader.load("/models/BUILDING/bathroom2.gltf",higher(current));
+  // gltfLoader.load("/models/BUILDING/bathroom2.gltf",higher(current));
 }
 
 loadModels();
@@ -203,13 +242,13 @@ function controlButtons(objects) {
       event.preventDefault();
     } else {
       if (toggleHover) {
-        for (let i = 1; i < objects.length; i++) {
-          scene.remove(objects[i]);
+        for (let i = 1; i < currentmodel.objects.length; i++) {
+          scene.remove(currentmodel.objects[i]);
         }
         toggleHover = false;
       } else {
-        for (let i = 1; i < objects.length; i++) {
-          scene.add(objects[i]);
+        for (let i = 1; i < currentmodel.objects.length; i++) {
+          scene.add(currentmodel.objects[i]);
         }
 
         toggleHover = true;
@@ -303,55 +342,38 @@ function controlButtons(objects) {
       defaultRect3 = [];
     }
   });
-
+  document.getElementById("btn4").addEventListener("click", () => {
+    // if (currentmodel === model2) {
+      removeFromScene(currentmodel.objects);
+      currentmodel = model1;
+      addToScene(currentmodel.objects);
+    // }
+  });
+  document.getElementById("btn5").addEventListener("click", () => {
+    removeFromScene(currentmodel.objects);
+      currentmodel = model2;
+      addToScene(currentmodel.objects);
+  });
   document.addEventListener("dblclick", () => {
     if (!toggleRoom) {
       if (idx !== null && idx >= 0) {
-        scene.remove(objects[0]);
-        scene.add((currentmodel.rooms)[idx]);
+        scene.remove(currentmodel.objects[0]);
+        scene.add(currentmodel.rooms[idx]);
         toggleRoom = true;
       }
     } else {
-      scene.add(objects[0]);
-      scene.remove((currentmodel.rooms)[idx]);
+      scene.add(currentmodel.objects[0]);
+      scene.remove(currentmodel.rooms[idx]);
       toggleRoom = false;
     }
   });
-
-  /* ***************************************** */
-
-  // POINTS
-
-  points = [
-    {
-      position: new THREE.Vector3(-4, 0.5, 0),
-      element: document.querySelector(".point-0"),
-    },
-    {
-      position: new THREE.Vector3(-5.5, 0.5, -2.5),
-      element: document.querySelector(".point-1"),
-    },
-    {
-      position: new THREE.Vector3(-3.8, 0.5, -2.5),
-      element: document.querySelector(".point-2"),
-    },
-    {
-      position: new THREE.Vector3(-2.5, 0.5, -2.5),
-      element: document.querySelector(".point-3"),
-    },
-    {
-      position: new THREE.Vector3(-1.5, 0.5, -2.5),
-      element: document.querySelector(".point-4"),
-    },
-  ];
 }
 
-controlButtons(currentObjects);
+controlButtons();
 
 // GROUND
 
 function ground() {
-
   var textureLoader = new THREE.TextureLoader();
 
   const grassColorTexture = textureLoader.load("/textures/grass/color.jpg");
@@ -411,24 +433,35 @@ function ground() {
 
 ground();
 
-function createFloor(floor) {
-  for (const room of currentmodel.rooms) {
+function createFloor(floor, model) {
+  for (const room of model.rooms) {
     floor.add(room);
   }
 }
 
 // BUILDING
 
-function createBuilding(count ,objects) {
+function createBuilding(count, model) {
   let height = -0.1;
   const floor = new THREE.Group();
   floor.castShadow = true;
-  createFloor(floor);
+  createFloor(floor, model);
   for (let currFloor = 0; currFloor < count; currFloor++, height += 1.7) {
     const fl = floor.clone();
     fl.position.set(0, height, 0);
-    scene.add(fl);
-    objects.push(fl);
+    model.objects.push(fl);
+  }
+}
+
+function addToScene(objects) {
+  for (const object of objects) {
+    scene.add(object);
+  }
+}
+
+function removeFromScene(objects) {
+  for (const object of objects) {
+    scene.remove(object);
   }
 }
 
@@ -539,29 +572,37 @@ manager.onLoad = () => {
   // optional: remove loader from DOM via event listener
   loadingScreen.addEventListener("transitionend", onTransitionEnd);
 
-  if (flag) {
-    createBuilding(currentCount ,currentObjects);
-  }
+  createBuilding(model1.count, model1);
+  createBuilding(model2.count, model2);
+  addToScene(model1.objects);
+
   const animate = () => {
+
+    if(currentmodel.objects === model1.objects){
+      console.log("1");
+    }
+    else{
+      console.log("2");
+    }
     // updating controls
 
     raycaster.setFromCamera(mouse, camera);
     intersects = raycaster.intersectObjects(scene.children, true);
 
     if (flag && toggleHover) {
-      changeFloorColor(currentObjects);
+      changeFloorColor(currentmodel.objects);
 
-      for (const point of points) {
+      for (const point of currentmodel.points) {
         point.element.style.display = "none";
       }
     } else {
       if (toggleRoom) {
-        for (const point of points) {
+        for (const point of currentmodel.points) {
           point.element.style.display = "none";
         }
       } else {
-        changeRoomColor(currentRooms, currentObjects);
-        for (const point of points) {
+        changeRoomColor(currentmodel.rooms, currentmodel.objects);
+        for (const point of currentmodel.points) {
           const screenPosition = point.position.clone();
           screenPosition.project(camera);
           const translateX = screenPosition.x * sizes.width * 0.5;
